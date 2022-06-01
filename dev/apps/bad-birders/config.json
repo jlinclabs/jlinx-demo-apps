@@ -1,0 +1,8 @@
+{
+  "name": "BadBirders",
+  "color": "aqua",
+  "port": 4001,
+  "url": "https://bad-birders.jlinx.test",
+  "sessionSecret": "i8fOv3cKg3xqryxNEtfbfNeDzkWLc54bGzHbiFRbVdh",
+  "postgresDatabaseUrl": "postgresql://localhost/jlinx-demo-bad-birders"
+}

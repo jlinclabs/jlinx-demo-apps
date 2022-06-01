@@ -1,0 +1,22 @@
+<form method="get" action="/dids/resolve">
+  <p>
+    <input
+      id="did-input"
+      type="text"
+      name="did"
+      value="{{did}}"
+      size="53"
+      placeholder="did:jlinx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    />
+  </p>
+  <button type="submit" class="btn btn-primary">RESOLVE</button>
+  <a href="/dids/resolve">reset</a>
+</form>
+{{#if did}}
+<h6>{{did}}</h6>
+{{#if didDocument}}
+<pre><code>{{toJSON didDocument}}</code></pre>
+{{else}}
+<i>unable to resolve</i>
+{{/if}}
+{{/if}}

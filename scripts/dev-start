@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+nodemon -w . --exec concurrently \
+  --kill-others \
+  --names "cat-walkers,bad-birders,dope-dogs" \
+  "APP_DIR=./dev/apps/cat-walkers ./scripts/start" \
+  "APP_DIR=./dev/apps/bad-birders ./scripts/start" \
+  "APP_DIR=./dev/apps/dope-dogs ./scripts/start"

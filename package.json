@@ -1,0 +1,39 @@
+{
+  "private": true,
+  "name": "jlinx-demo-apps",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "./scripts/start",
+    "start:dev": "nodemon -w . --exec ./scripts/dev-start"
+  },
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jlinclabs/jlinx-demo-apps.git"
+  },
+  "author": "Jared Grippe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jlinclabs/jlinx-demo-apps/issues"
+  },
+  "homepage": "https://github.com/jlinclabs/jlinx-demo-apps#readme",
+  "dependencies": {
+    "body-parser": "^1.19.2",
+    "cookie-parse": "^0.4.0",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.17.3",
+    "express-hbs": "^2.4.0",
+    "express-promise-router": "^4.1.1",
+    "express-session": "^1.17.3",
+    "jlinx-client": "github:jlinclabs/jlinx-client",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^2.0.0",
+    "passport": "^0.5.3",
+    "passport-local": "^1.0.0",
+    "pg": "^8.7.3",
+    "qrcode": "^1.5.0"
+  },
+  "devDependencies": {
+    "concurrently": "^7.2.1"
+  }
+}

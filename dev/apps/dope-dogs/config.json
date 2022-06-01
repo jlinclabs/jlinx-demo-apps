@@ -1,0 +1,8 @@
+{
+  "name": "DopeDogs",
+  "color": "khaki",
+  "port": 4002,
+  "url": "https://dope-dogs.jlinx.test",
+  "sessionSecret": "bkWLc54bbVdhi8fOv3fNeGzHbiFRcKg3xqryxNEtfDz",
+  "postgresDatabaseUrl": "postgresql://localhost/jlinx-demo-dope-dogs"
+}

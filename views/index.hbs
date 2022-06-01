@@ -1,0 +1,70 @@
+{{#if currentUser}}
+  <h2>
+    Welcome back
+    {{#if currentUser.realname}}
+      {{currentUser.realname}}
+    {{else}}
+      @{{currentUser.username}}
+    {{/if}}
+  </h2>
+  <ul>
+    <li>
+      <form method="post" action="/logout">
+        <a href="/logout" onclick="this.parentElement.submit(); return false">logout</a>
+      </form>
+    </li>
+    <li>
+      <a href="/@{{currentUser.username}}">profile</a>
+    </li>
+  </ul>
+
+{{else}}
+  <h5>Welcome</h5>
+  <ul>
+    <li><a href="/signup">signup</a></li>
+    <li><a href="/login">login</a></li>
+    <li><a href="/jlinx-login">login with Jlinx</a></li>
+  </ul>
+{{/if}}
+
+<a href="/dids/resolve">resolve a did</a>
+
+{{!-- <hr/>
+
+<h5>Other Apps</h5>
+<ul>
+  {{#each partnerApps}}
+    <li>
+      <a href="{{url}}">{{name}}</a>
+      {{#if ../session}}
+        <span> | </span>
+        <a href="/send-me-to?app={{url}}">hyper-login</a>
+      {{/if}}
+    </li>
+  {{/each}}
+</ul>
+
+<h5>Users</h5>
+<ul>
+  {{#each users}}
+    <li>
+      <a href="/@{{username}}">@{{username}}</a>
+      <span> - </span>
+      <a href="/@{{username}}">{{realname}}</a>
+      <span> - </span>
+      <form method="post" action="/login" style="display: inline">
+        <input type="hidden" name="username" value="{{username}}"/>
+        <a href="/login" onclick="this.parentElement.submit(); return false">login-as</a>
+      </form>
+      <span> - </span>
+      <a href="/__hyperlinc/{{hyperlinc_id}}" class="truncate">{{hyperlinc_id}}</a>
+    </li>
+  {{else}}
+    <i>no users :(</i>
+  {{/each}}
+</ul>
+
+<h5>Hyperlinc Status</h5>
+<p>Connected: {{#if hyperlincStatus.connected}}yes{{else}}no{{/if}}</p>
+<p># of cores: {{hyperlincStatus.numberOfCores}}</p>
+<p>CORES:<br/>{{toJSON hyperlincStatus.cores}}</p> --}}

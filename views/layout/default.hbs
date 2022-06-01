@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <link type="text/css" rel="stylesheet" href="/almond.css"/>
+    <style>
+      :root {
+        --primaryL: 30%;
+        --app-color: {{appColor}};
+      }
+      html {
+        background-color: var(--app-color);
+      }
+      h1 > a:link {
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1><a href="/">{{appName}}</a></h1>
+      {{{body}}}
+    </div>
+  </body>
+</html>
+

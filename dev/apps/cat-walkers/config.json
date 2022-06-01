@@ -1,0 +1,8 @@
+{
+  "name": "CatWalkers",
+  "color": "salmon",
+  "port": 4000,
+  "url": "https://cat-walkers.jlinx.test",
+  "sessionSecret": "biFRbVdhNeDzkWLc54bi8fOv3cKg3xqryxNEtfbfGzH",
+  "postgresDatabaseUrl": "postgresql://localhost/jlinx-demo-cat-walkers"
+}

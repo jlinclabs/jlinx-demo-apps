@@ -1,0 +1,14 @@
+<h1>hyperlincEvents</h1>
+
+
+<h4>LENGTH: {{hyperlincEvents.length}}</h4>
+<h4>writable: {{writable}}</h4>
+
+{{#each hyperlincEvents}}
+  <fieldset>
+    <legend>{{eventType}}</legend>
+    {{at}}
+    <pre>{{toJSON this}}</pre>
+  </fieldset>
+
+{{/each}}
