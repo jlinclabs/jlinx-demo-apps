@@ -3,6 +3,8 @@
   "color": "khaki",
   "port": 4002,
   "url": "https://dope-dogs.jlinx.test",
+  "jlinxHost": "https://testnet2.jlinx.test",
+  "jlinxVaultKey": "50b1c52dab3e794a635db52671319f937ab5d50fdecd80290667850278930937",
   "sessionSecret": "bkWLc54bbVdhi8fOv3fNeGzHbiFRcKg3xqryxNEtfDz",
   "postgresDatabaseUrl": "postgresql://localhost/jlinx-demo-dope-dogs"
 }

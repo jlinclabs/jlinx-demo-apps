@@ -3,6 +3,8 @@
   "color": "aqua",
   "port": 4001,
   "url": "https://bad-birders.jlinx.test",
+  "jlinxHost": "https://testnet1.jlinx.test",
+  "jlinxVaultKey": "3a7f4af663356319c9c22ec213e37c33efde8db9d8bed13b869ae93a745c750c",
   "sessionSecret": "i8fOv3cKg3xqryxNEtfbfNeDzkWLc54bGzHbiFRbVdh",
   "postgresDatabaseUrl": "postgresql://localhost/jlinx-demo-bad-birders"
 }
