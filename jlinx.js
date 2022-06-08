@@ -6,9 +6,11 @@ const JlinxClient = require('jlinx-client')
 console.log({appConfig})
 
 const jlinx = new JlinxClient({
+  hostUrl: appConfig.jlinxHost,
   vaultPath: Path.join(appConfig.APP_DIR, 'jlinx.vault'),
-  vaultKey: b4a.from(appConfig.jlinxVaultKey, 'hex'),
-  hostUrl: appConfig.jlinxHost
+  vaultKey: b4a.from(appConfig.jlinxVaultKey, 'hex')
 })
+
+console.log({jlinx})
 
 module.exports = jlinx

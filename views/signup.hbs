@@ -7,18 +7,10 @@
   <h2>Welcome back @{{currentUser.username}}</h2>
 
 {{else}}
-  <h5>Welcome New User</h5>
-  <form method="post" action="/signup">
-    <p>
-      <label for="signup-input-username">Signup</label><br/>
-      <input required id="signup-input-username"
-        pattern="[a-z]{1}[a-z0-9]{3,20}"
-        type="text" name="username" placeholder="username" />
-      {{!-- <input required type="text" name="realname" placeholder="realname" /> --}}
-      <button type="submit" class="btn btn-primary">SIGNUP</button>
-    </p>
+  <h5>Signup</h5>
+  <form method="post" action="/signup-with-jlinx">
+    <button type="submit" class="btn btn-primary">Login or Signup with JLINX</button>
   </form>
-
 {{/if}}
 
 <hr/>

@@ -13,11 +13,41 @@ class User {
     return !!(user && await user.verifyPassword(password))
   }
 
+  static async findById(userId){
+    const [ record ] = await knex('users')
+      .select('*')
+      .where({ id: userId })
+      .limit(1)
+    if (record) return new User(record)
+  }
+
   static async findByUsername(username){
-    return await knex('users')
+    const [ record ] = await knex('users')
       .select('*')
       .where({ username })
       .limit(1)
+    if (record) return new User(record)
+  }
+
+  static async create(values = {}){
+    let record = {}
+    if (values.username){
+      record.username = values.username
+    }
+    if (values.jlinxAppAccountId){
+      record.jlinx_app_account_id = values.jlinxAppAccountId
+    }
+    const rows = await knex('users')
+      .insert(record)
+      .returning('*')
+    return new User(rows[0])
+  }
+
+  constructor(record){
+    this.id = record.id
+    this.username = record.username
+    this.jlinxAppAccountId = record.jlinx_app_account_id
+
   }
 
 }

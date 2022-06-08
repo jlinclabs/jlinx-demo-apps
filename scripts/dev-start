@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-nodemon -w . --exec concurrently \
+nodemon \
+  -w . \
+  -w ./node_modules \
+  --exec concurrently \
   --kill-others \
   --names "cat-walkers,bad-birders,dope-dogs" \
   "APP_DIR=./dev/apps/cat-walkers ./scripts/start" \

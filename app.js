@@ -1,7 +1,8 @@
 const Path = require('path')
+const { URL } = require('url')
 const crypto = require('crypto')
 const express = require('express')
-const Router = require("express-promise-router");
+const Router = require("express-promise-router")
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const expressSession = require('express-session')
@@ -72,6 +73,15 @@ app.use(router)
 
 router.use('*', async (req, res, next) => {
   console.log('SESSION', req.session)
+  req.session.touch()
+  if (req.session.userId){
+    res.locals.userId = req.session.userId
+    res.locals.currentUser = await app.users.findById(req.session.userId)
+    if (!res.locals.currentUser){
+      req.session.destroy()
+      return res.status(401).redirect('/')
+    }
+  }
   // const sessionJwt = req.cookies[COOKIE_NAME]
   // let session
   // if (sessionJwt){
@@ -135,12 +145,92 @@ router.get('/jlinx-login', async (req, res) => {
 })
 
 router.post('/logout', (req, res) => {
-  req.logout()
+  req.session.destroy()
   res.redirect('/')
 })
 
 router.get('/signup', (req, res) => {
   res.render('signup')
+})
+
+router.post('/signup-with-jlinx', async (req, res) => {
+  const followupUrl = new URL(
+    '/signup-with-jlinx/complete',
+    `${req.protocol}://${req.get('host')}`
+  ).toString()
+  // const followupUrl = req.url + '/signup-with-jlinx/complete'
+  const appUser = await app.jlinx.createAppUser({
+    followupUrl,
+
+  })
+  // TODO persist appUser in postgres
+  const qrcodeDataUri = await QRCode.toDataURL(appUser.id)
+  res.render('signup-with-jlinx', {
+    appUserId: appUser.id,
+    qrcodeDataUri,
+  })
+})
+
+router.get('/signup-with-jlinx/wait', async (req, res) => {
+  const { id } = req.query
+  const appUserDoc = await app.jlinx.get(id)
+  await appUserDoc.waitForUpdate()
+  await appUserDoc.update()
+  if (appUserDoc.length === 1){
+    res.status(400).end()
+  }
+  const appUserE2 = await appUserDoc.getJson(1)
+  console.log({ appUserE2 })
+
+  let user
+  if (appUserE2 && appUserE2.userId){
+    user = await app.users.findById(appUserE2.userId)
+  }
+  console.log({ user })
+  if (user){
+    // login user
+    req.session.userId = user.id
+    console.log('SIGNUP COMPLETE SUCCEESS', req.session)
+    res.status(200).end()
+  }else{
+    res.status(400).end()
+  }
+})
+
+router.post('/signup-with-jlinx/complete', async (req, res) => {
+  console.log('BODY', req.body)
+  const {
+    appUserId,
+    appAccountId,
+    signupSecret
+  } = req.body
+  const appUser = await app.jlinx.get(appUserId)
+  const appUserValue = await appUser.getJson(0)
+  const appAccount = await app.jlinx.get(appAccountId)
+  const appAccountValue = await appAccount.getJson(0)
+  console.log({
+    appUser: appUserValue,
+    appAccount: appAccountValue,
+  })
+
+  if (
+    appAccountValue &&
+    appAccountValue.appUser === appUser.id &&
+    appAccountValue.signupSecret === appUserValue.signupSecret
+  ){
+    // create user record
+    const user = await app.users.create({
+      jlinxAppUserId: appUserId
+    })
+    await appUser.appendJson({
+      appAccountId,
+      userId: user.id,
+    })
+    // create session in the other tab that was waiting for us
+    res.status(200).json({})
+  }else{
+    res.status(400).json({})
+  }
 })
 
 router.post('/signup', async (req, res) => {
@@ -242,5 +332,6 @@ router.get('/dids/resolve', async (req, res) => {
 
 
 router.use((error, req, res, next) => {
+  console.error('ERROR', error)
   res.render('error', { error })
 })

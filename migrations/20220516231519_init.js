@@ -1,19 +1,19 @@
-exports.up = function(knex) {
-  knex.schema.createTable('users', function (table) {
-    table.increments().primary()
-    table.string('username').unique().notNullable()
-    table.string('jlinx_account_id')
+exports.up = async function(knex) {
+  await knex.schema.createTable('users', function (table) {
+    table.increments('id').primary()
+    table.string('username')
+    table.string('jlinx_app_account_id')
     table.timestamps()
   })
-  knex.schema.createTable('tweets', function (table) {
+  await knex.schema.createTable('tweets', function (table) {
     table.increments().primary()
-    table.string('username').notNullable().references('users.username')
+    table.integer('user_id').notNullable().references('users.id')
     table.string('content')
     table.timestamps()
   })
 }
 
-exports.down = function(knex) {
-  knex.schema.dropTable('tweets')
-  knex.schema.dropTable('users')
+exports.down = async function(knex) {
+  await knex.schema.dropTable('tweets')
+  await knex.schema.dropTable('users')
 }
