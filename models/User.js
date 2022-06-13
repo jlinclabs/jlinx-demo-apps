@@ -30,12 +30,14 @@ class User {
   }
 
   static async create(values = {}){
-    let record = {}
+    let record = {
+      created_at: new Date,
+    }
     if (values.username){
       record.username = values.username
     }
-    if (values.jlinxAppAccountId){
-      record.jlinx_app_account_id = values.jlinxAppAccountId
+    if (values.jlinxAppUserId){
+      record.jlinx_app_user_id = values.jlinxAppUserId
     }
     const rows = await knex('users')
       .insert(record)
@@ -44,10 +46,25 @@ class User {
   }
 
   constructor(record){
+    this._update(record)
+  }
+
+  _update(record){
+    if (!record || !record.id) throw new Error(`bad record`)
     this.id = record.id
     this.username = record.username
-    this.jlinxAppAccountId = record.jlinx_app_account_id
+    this.jlinxAppUserId = record.jlinx_app_user_id
+  }
 
+  async update(changes){
+    const records = await knex('users')
+      .update({
+        username: changes.username,
+        updated_at: new Date,
+      })
+      .where({ id: this.id })
+      .returning('*')
+      this._update(records[0])
   }
 
 }

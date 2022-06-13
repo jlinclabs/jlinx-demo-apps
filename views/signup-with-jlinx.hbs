@@ -1,15 +1,17 @@
-<p>
-  <input
-    type="text"
-    value="{{appUserId}}"
-    style="width: 48em"
-    onclick="this.select()"
-    oninput="false"
-  />
-</p>
-<p><img src="{{qrcodeDataUri}}"/></p>
-<p>copy the code above and paste into the "new app account" section of your authenticator app</p>
-
+<page class="page centered">
+  <p>
+    <input
+      type="text"
+      value="{{appUserId}}"
+      style="width: 27em; font-family: monospace;"
+      onclick="this.select()"
+      oninput="false"
+      readonly
+    />
+  </p>
+  <p>copy the code above and paste into the "new app account" section of your authenticator app</p>
+  <p><img src="{{qrcodeDataUri}}"/></p>
+</page>
 
 <script>
   (async () => {

@@ -1,0 +1,68 @@
+html {
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: helvetica, arial, sans-serif;
+}
+
+:root {
+  --primaryL: 30%;
+  /* --app-color: {{appColor}}; */
+}
+
+html {
+  background-color: var(--app-color);
+}
+
+html > body {
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a[href].appname {
+  text-decoration: none;
+}
+.appname > h3 {
+  margin: 10px 0;
+}
+
+body > header > nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  min-height: 50px;
+  align-items: stretch;
+}
+
+html > body > main {
+  flex: 1 1;
+}
+
+html > body > aside {
+  width: 100px;
+}
+
+html > body > footer {
+  padding: 10px;
+  text-align: center;
+  font-size: 80%;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+}
+
+.page.centered {
+  align-items: center;
+}

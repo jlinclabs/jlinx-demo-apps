@@ -1,34 +1,31 @@
-{{#if currentUser}}
-  <h2>
-    Welcome back
-    {{#if currentUser.realname}}
-      {{currentUser.realname}}
-    {{else}}
-      @{{currentUser.username}}
-    {{/if}}
-  </h2>
-  <ul>
-    <li>
-      <form method="post" action="/logout">
-        <a href="/logout" onclick="this.parentElement.submit(); return false">logout</a>
-      </form>
-    </li>
-    <li>
-      <a href="/@{{currentUser.username}}">profile</a>
-    </li>
-  </ul>
+<div class="page centered">
+  {{#if currentUser}}
+    <h2>
+      Welcome back
+      {{#if currentUser.username}}
+        @{{currentUser.username}}
+      {{else}}
+        User #{{currentUser.id}}
+      {{/if}}
+    </h2>
+    <ul>
+      <li>
+        <a href="/logout">logout</a>
+      </li>
+      {{!-- <li>
+        <a href="/@{{currentUser.username}}">profile</a>
+      </li> --}}
+    </ul>
 
-{{else}}
-  <h5>Welcome</h5>
-  <ul>
-    <li><a href="/signup">signup</a></li>
-    <li><a href="/login">login</a></li>
-    <li><a href="/jlinx-login">login with Jlinx</a></li>
-  </ul>
-{{/if}}
+  {{else}}
+    <h1>Welcome</h1>
+    <div><a class="button" href="/signup">signup</a></div>
+    <div style="margin-top: 10px"></div>
+    <div><a class="button" href="/login">login</a></div>
+  {{/if}}
 
-<a href="/dids/resolve">resolve a did</a>
-
+  {{!-- <a href="/dids/resolve">resolve a did</a> --}}
+</div>
 {{!-- <hr/>
 
 <h5>Other Apps</h5>

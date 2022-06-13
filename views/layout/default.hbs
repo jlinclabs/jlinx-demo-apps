@@ -3,24 +3,30 @@
   <head>
     <title>{{title}}</title>
     <link type="text/css" rel="stylesheet" href="/almond.css"/>
+    <link type="text/css" rel="stylesheet" href="/base.css"/>
     <style>
       :root {
-        --primaryL: 30%;
         --app-color: {{appColor}};
-      }
-      html {
-        background-color: var(--app-color);
-      }
-      h1 > a:link {
-        text-decoration: none;
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1><a href="/">{{appName}}</a></h1>
+    <header>
+      <nav>
+        <a class="appname" href="/"><h3>{{appName}}</h3></a>
+      </nav>
+    </header>
+    <aside>
+      <nav>
+
+      </nav>
+    </aside>
+    <main>
       {{{body}}}
-    </div>
+    </main>
+    <footer>
+      Copyright {{appName}} © 2020
+    </footer>
   </body>
 </html>
 

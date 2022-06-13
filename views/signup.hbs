@@ -1,16 +1,11 @@
-
-{{!-- <textarea style="width: 100vw; height: 100vh;">{{debug}}</textarea> --}}
-
-
-
-{{#if currentUser}}
-  <h2>Welcome back @{{currentUser.username}}</h2>
-
-{{else}}
-  <h5>Signup</h5>
-  <form method="post" action="/signup-with-jlinx">
-    <button type="submit" class="btn btn-primary">Login or Signup with JLINX</button>
-  </form>
-{{/if}}
-
-<hr/>
+<div class="page centered">
+  {{#if currentUser}}
+    <h2>Welcome back!</h2>
+  {{else}}
+    <h5>Signup</h5>
+    <form method="post" action="/signup-with-jlinx">
+      <button type="submit" class="btn btn-primary">Signup with JLINX</button>
+    </form>
+    <a href="/">back</a>
+  {{/if}}
+</div>

@@ -242,7 +242,12 @@ input[type="file"] {
   min-width: auto;
   padding: 0; }
 
+a[href].button{
+  text-decoration: none;
+  line-height: 36px;
+}
 button,
+a[href].button,
 input[type="button"],
 input[type="reset"],
 input[type="submit"] {

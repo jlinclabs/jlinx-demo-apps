@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-exec knex migrate:up
+knex migrate:down
+knex migrate:up

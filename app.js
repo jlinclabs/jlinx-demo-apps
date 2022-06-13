@@ -9,6 +9,7 @@ const expressSession = require('express-session')
 const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
 const QRCode = require('qrcode')
+const { now, createRandomString } = require('jlinx-util')
 
 const app = express()
 module.exports = app
@@ -72,36 +73,48 @@ const router = Router()
 app.use(router)
 
 router.use('*', async (req, res, next) => {
-  console.log('SESSION', req.session)
-  req.session.touch()
-  if (req.session.userId){
-    res.locals.userId = req.session.userId
-    res.locals.currentUser = await app.users.findById(req.session.userId)
-    if (!res.locals.currentUser){
-      req.session.destroy()
+  const { session } = req
+  console.log('SESSION', session)
+  session.touch()
+  let currentUser
+  if (session.userId){
+    currentUser = await app.users.findById(session.userId)
+    if (!currentUser){
+      console.log('DESTROYING SESSION')
+      session.destroy()
       return res.status(401).redirect('/')
     }
   }
-  // const sessionJwt = req.cookies[COOKIE_NAME]
-  // let session
-  // if (sessionJwt){
-  //   try{
-  //     session = await verifySession(sessionJwt)
-  //   }catch(error){
-  //     res.cookie('session', null)
-  //   }
-  // }
+  if (currentUser) {
+    console.log({ currentUser })
+    console.log(currentUser.username)
+  }
 
-  // let currentUser
-  // if (session) {
-  //   currentUser = await app.users.get(session.username)
-  //   if (!currentUser){
-  //     res.status(401).clearCookie(COOKIE_NAME).redirect('/')
-  //     return
-  //   }
-  // }
+  Object.assign(req, {
+    currentUser
+  })
+  Object.assign(res.locals, {
+    currentUser,
+    // wtf: currentUser
+    //   ? {
+    //     id: currentUser.id,
+    //     username: currentUser.username,
+    //     jlinxAppUserId: currentUser.jlinxAppUserId,
+    //   }
+    //   : null,
+  })
 
-  // Object.assign(res.locals, { session, currentUser })
+  console.log('REQ METHOD', [req.method])
+  if (
+    currentUser &&
+    !currentUser.username &&
+    req.method === 'GET' &&
+    req.url !== '/logout'
+  ){
+    return res.render('complete-account', {
+      destination: req.url,
+    })
+  }
 
   next()
 })
@@ -112,42 +125,6 @@ router.get('/', async (req, res) => {
   })
 })
 
-router.get('/login', async (req, res) => {
-  res.render('login')
-})
-
-router.post('/login', async (req, res) => {
-  res.redirect('/')
-})
-
-router.get('/jlinx-login', async (req, res) => {
-  await app.jlinx.server.connected()
-  await app.jlinx.server.hypercore.hasPeers()
-  // TODO make an account, not a DID
-  // i.e. const jlinxAppAccount = jlinx.create
-
-  // MOVE ME TO jlinx-app
-  // create a new ledger
-  const signingKeyPair = await app.jlinx.server.keys.createSigningKeyPair()
-  const publicKey = signingKeyPair.publicKeyAsString
-  // const core = await this.hypercore.getCore(signingKeyPair.publicKey, signingKeyPair.secretKey)
-  // write account and app information to ledger (signed by app public key?)
-  // await core.append()
-  // verify signature by getting the agent public key from `${PROVIDED_JLINX_API_URL}/publickey`
-
-  // const didDocument = await app.jlinx.createDid()
-  // const publicKey = didDocument.id.split(':')[2]
-  console.log({ publicKey })
-  const qrcodeDataUri = await QRCode.toDataURL(publicKey)
-  res.render('jlinx_login', {
-    publicKey, qrcodeDataUri
-  })
-})
-
-router.post('/logout', (req, res) => {
-  req.session.destroy()
-  res.redirect('/')
-})
 
 router.get('/signup', (req, res) => {
   res.render('signup')
@@ -155,10 +132,10 @@ router.get('/signup', (req, res) => {
 
 router.post('/signup-with-jlinx', async (req, res) => {
   const followupUrl = new URL(
-    '/signup-with-jlinx/complete',
+    '/signup-with-jlinx/followup',
     `${req.protocol}://${req.get('host')}`
   ).toString()
-  // const followupUrl = req.url + '/signup-with-jlinx/complete'
+  // const followupUrl = req.url + '/signup-with-jlinx/followup'
   const appUser = await app.jlinx.createAppUser({
     followupUrl,
 
@@ -197,7 +174,7 @@ router.get('/signup-with-jlinx/wait', async (req, res) => {
   }
 })
 
-router.post('/signup-with-jlinx/complete', async (req, res) => {
+router.post('/signup-with-jlinx/followup', async (req, res) => {
   console.log('BODY', req.body)
   const {
     appUserId,
@@ -220,7 +197,8 @@ router.post('/signup-with-jlinx/complete', async (req, res) => {
   ){
     // create user record
     const user = await app.users.create({
-      jlinxAppUserId: appUserId
+      jlinxAppUserId: appUserId,
+      // other data can go here
     })
     await appUser.appendJson({
       appAccountId,
@@ -233,10 +211,75 @@ router.post('/signup-with-jlinx/complete', async (req, res) => {
   }
 })
 
-router.post('/signup', async (req, res) => {
-  const { username, realname } = req.body
-  const user = await app.users.create({ username, realname })
-  createSessionCookie(res, user.username, `/@${user.username}`)
+router.post('/complete-account', async (req, res) => {
+  const { destination, username } = req.body
+  await req.currentUser.update({ username })
+  res.redirect(destination)
+})
+// router.post('/signup', async (req, res) => {
+//   const { username, realname } = req.body
+//   const user = await app.users.create({ username, realname })
+//   createSessionCookie(res, user.username, `/@${user.username}`)
+// })
+
+
+router.get('/login', async (req, res) => {
+  res.render('login')
+})
+
+router.post('/login', async (req, res) => {
+  const { username } = req.body
+  const user = await app.users.findByUsername(username)
+
+  console.log({ user })
+  if (user.jlinxAppUserId){
+    const appUser = await app.jlinx.get(user.jlinxAppUserId)
+    console.log(
+      'APPENDING login-requeste event to ',
+      appUser.id,
+      appUser
+    )
+    await appUser.appendJson({
+      event: 'login-requested',
+      secret: createRandomString(),
+      at: now(),
+      // TODO add location and device into here
+    })
+
+    // res.redirect('/')
+    res.render('login-with-jlinx')
+  }else{
+    res.render('login-with-password')
+  }
+})
+
+// router.get('/jlinx-login', async (req, res) => {
+//   await app.jlinx.server.connected()
+//   await app.jlinx.server.hypercore.hasPeers()
+//   // TODO make an account, not a DID
+//   // i.e. const jlinxAppAccount = jlinx.create
+
+//   // MOVE ME TO jlinx-app
+//   // create a new ledger
+//   const signingKeyPair = await app.jlinx.server.keys.createSigningKeyPair()
+//   const publicKey = signingKeyPair.publicKeyAsString
+//   // const core = await this.hypercore.getCore(signingKeyPair.publicKey, signingKeyPair.secretKey)
+//   // write account and app information to ledger (signed by app public key?)
+//   // await core.append()
+//   // verify signature by getting the agent public key from `${PROVIDED_JLINX_API_URL}/publickey`
+
+//   // const didDocument = await app.jlinx.createDid()
+//   // const publicKey = didDocument.id.split(':')[2]
+//   console.log({ publicKey })
+//   const qrcodeDataUri = await QRCode.toDataURL(publicKey)
+//   res.render('jlinx_login', {
+//     publicKey, qrcodeDataUri
+//   })
+// })
+
+router.get('/logout', (req, res) => {
+  req.session.destroy()
+  res.redirect('/')
 })
 
 router.get('/@:username', async (req, res) => {
