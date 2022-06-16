@@ -1,7 +1,7 @@
 {
   "name": "BadBirders",
   "color": "aqua",
-  "port": 4001,
+  "port": 4581,
   "url": "https://bad-birders.jlinx.test",
   "jlinxHost": "https://testnet1.jlinx.test",
   "jlinxVaultKey": "3a7f4af663356319c9c22ec213e37c33efde8db9d8bed13b869ae93a745c750c",

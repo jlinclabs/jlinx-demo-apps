@@ -1,7 +1,7 @@
 {
   "name": "CatWalkers",
   "color": "salmon",
-  "port": 4000,
+  "port": 4580,
   "url": "https://cat-walkers.jlinx.test",
   "jlinxHost": "https://testnet1.jlinx.test",
   "jlinxVaultKey": "ebdea2b46211d1583712feee504e6551fcdc01deff806364c3af074f9397d6bc",
