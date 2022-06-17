@@ -41,6 +41,7 @@ app.engine('hbs', hbs.express4({
 }))
 app.set('view engine', 'hbs')
 app.set('views', __dirname + '/views')
+app.set('trust proxy', true) // TODO review this. did it to get req.ip
 Object.assign(app.locals, {
   appName,
   appColor: app.config.color,
@@ -271,17 +272,25 @@ router.post('/login', async (req, res) => {
   console.log({ user })
   if (user.jlinxAppUserId){
     const appUser = await app.jlinx.get(user.jlinxAppUserId)
+    await appUser.update()
     console.log(
       'APPENDING login-requeste event to ',
-      appUser.id,
       appUser
     )
-    await appUser.appendJson({
-      event: 'login-requested',
-      secret: createRandomString(),
-      at: now(),
-      // TODO add location and device into here
+    await appUser.requestSession({
+      sourceInfo: {
+        // TODO send in info about browser, IP etc.
+        ipAddress: (
+          req.ip || req.get('x-forwarded-for') || req.socket.remoteAddress
+        ),
+      }
     })
+    // {
+    //   event: 'login-requested',
+    //   secret: createRandomString(),
+    //   at: now(),
+    //   // TODO add location and device into here
+    // })
 
     // res.redirect('/')
     res.render('login-with-jlinx')
