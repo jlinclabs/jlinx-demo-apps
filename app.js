@@ -10,6 +10,7 @@ const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
 const QRCode = require('qrcode')
 const { now, createRandomString } = require('jlinx-util')
+const requestInfo = require('request-info')
 
 const app = express()
 module.exports = app
@@ -268,32 +269,21 @@ router.get('/login', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { username } = req.body
   const user = await app.users.findByUsername(username)
-
-  console.log({ user })
+  console.log('POST /login', { user })
   if (user.jlinxAppUserId){
     const appUser = await app.jlinx.get(user.jlinxAppUserId)
     await appUser.update()
-    console.log(
-      'APPENDING login-requeste event to ',
-      appUser
-    )
+    console.log('POST /login', 'requesting session for', appUser)
+    const sourceInfo = requestInfo(req)
     await appUser.requestSession({
       sourceInfo: {
-        // TODO send in info about browser, IP etc.
-        ipAddress: (
-          req.ip || req.get('x-forwarded-for') || req.socket.remoteAddress
-        ),
+        ip: sourceInfo.ip,
+        ua: sourceInfo.ua,
       }
     })
-    // {
-    //   event: 'login-requested',
-    //   secret: createRandomString(),
-    //   at: now(),
-    //   // TODO add location and device into here
-    // })
-
-    // res.redirect('/')
     res.render('login-with-jlinx')
+  // else if (user has a password)
+    // then render a page prompting for a password
   }else{
     res.render('login-with-password')
   }
