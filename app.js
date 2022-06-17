@@ -87,23 +87,13 @@ router.use('*', async (req, res, next) => {
       return res.status(401).redirect('/')
     }
   }
-  if (currentUser) {
-    console.log({ currentUser })
-    console.log(currentUser.username)
-  }
+  console.log({ currentUser })
 
   Object.assign(req, {
     currentUser
   })
   Object.assign(res.locals, {
     currentUser,
-    // wtf: currentUser
-    //   ? {
-    //     id: currentUser.id,
-    //     username: currentUser.username,
-    //     jlinxAppUserId: currentUser.jlinxAppUserId,
-    //   }
-    //   : null,
   })
 
   console.log('REQ METHOD', [req.method])
@@ -255,12 +245,6 @@ router.post('/complete-account', async (req, res) => {
   await req.currentUser.update({ username })
   res.redirect(destination)
 })
-// router.post('/signup', async (req, res) => {
-//   const { username, realname } = req.body
-//   const user = await app.users.create({ username, realname })
-//   createSessionCookie(res, user.username, `/@${user.username}`)
-// })
-
 
 router.get('/login', async (req, res) => {
   res.render('login')
@@ -289,30 +273,6 @@ router.post('/login', async (req, res) => {
   }
 })
 
-// router.get('/jlinx-login', async (req, res) => {
-//   await app.jlinx.server.connected()
-//   await app.jlinx.server.hypercore.hasPeers()
-//   // TODO make an account, not a DID
-//   // i.e. const jlinxAppAccount = jlinx.create
-
-//   // MOVE ME TO jlinx-app
-//   // create a new ledger
-//   const signingKeyPair = await app.jlinx.server.keys.createSigningKeyPair()
-//   const publicKey = signingKeyPair.publicKeyAsString
-//   // const core = await this.hypercore.getCore(signingKeyPair.publicKey, signingKeyPair.secretKey)
-//   // write account and app information to ledger (signed by app public key?)
-//   // await core.append()
-//   // verify signature by getting the agent public key from `${PROVIDED_JLINX_API_URL}/publickey`
-
-//   // const didDocument = await app.jlinx.createDid()
-//   // const publicKey = didDocument.id.split(':')[2]
-//   console.log({ publicKey })
-//   const qrcodeDataUri = await QRCode.toDataURL(publicKey)
-//   res.render('jlinx_login', {
-//     publicKey, qrcodeDataUri
-//   })
-// })
-
 router.get('/logout', (req, res) => {
   req.session.destroy()
   res.redirect('/')
@@ -335,67 +295,6 @@ router.post('/profile', async (req, res) => {
   await app.users.updateProfile(username, changes)
   res.redirect(`/@${username}`)
 })
-
-// router.get('/send-me-to', (req, res) => {
-//   const { currentUser } = res.locals
-//   const appUrl = req.query.app
-//   res.redirect(`${appUrl}/hyper-login?hlid=${currentUser.hyperlinc_id}`)
-// })
-
-// router.get('/hyper-login', async (req, res) => {
-//   const hyperlincId = req.query.hlid
-//   const user = await app.users.findByHyperlincId(hyperlincId)
-//   if (user) return createSessionCookie(res, user.username)
-
-//   const [hlProfile] = await app.hl.getProfiles([hyperlincId])
-//   if (hlProfile){
-//     if (hlProfile.preferredUsername){
-//       const user = await app.users.create({
-//         username: hlProfile.preferredUsername,
-//         hyperlincId,
-//       })
-//       return createSessionCookie(res, user.username)
-//     }
-//     const hyperlincStatus = await app.hl.status()
-//     return res.render('hypersignup', {
-//       hyperlincId, hlProfile, hyperlincStatus
-//     })
-//   }
-//   res.render('error', { error: { message: 'didnt work :(' }})
-// })
-
-// router.post('/hyper-signup', async (req, res) => {
-//   const { hlid: hyperlincId, username } = req.body
-//   const user = await app.users.create({ username, hyperlincId })
-//   return createSessionCookie(res, user.username)
-// })
-
-// router.post('/zcap-signup', async (req, res) => {
-//   const { jlincDid, username } = req.body
-//   const user = await app.users.create({ username, jlincDid })
-//   return createSessionCookie(res, user.username)
-// })
-
-// router.get('/__hyperlinc/:id', async (req, res) => {
-//   const { id } = req.params
-//   const identity = await app.hl.getIdentity(id)
-//   await identity.update()
-//   const hyperlincEvents = await identity.getAllEvents()
-//   const writable = (
-//     await app.pg.query(
-//       `
-//       SELECT 1
-//       FROM hyperlinc_secret_keys
-//       WHERE hyperlinc_id = $1
-//       `,
-//       [id]
-//     )
-//   ).rowCount > 0
-//   res.render('hyperlinc_events', {
-//     writable,
-//     hyperlincEvents,
-//   })
-// })
 
 router.get('/jlinx/status', async (req, res) => {
   await app.jlinx.server.ready()
