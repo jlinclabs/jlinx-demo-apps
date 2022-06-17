@@ -138,8 +138,13 @@ router.post('/signup-with-jlinx', async (req, res) => {
   // const followupUrl = req.url + '/signup-with-jlinx/followup'
   const appUser = await app.jlinx.createAppUser({
     followupUrl,
-
   })
+  appUser.update()
+  console.log(
+    '\n\n!!!CREATED APP USER',
+    appUser,
+    await appUser._value
+  )
   // TODO persist appUser in postgres
   const qrcodeDataUri = await QRCode.toDataURL(appUser.id)
   res.render('signup-with-jlinx', {
@@ -149,14 +154,30 @@ router.post('/signup-with-jlinx', async (req, res) => {
 })
 
 router.get('/signup-with-jlinx/wait', async (req, res) => {
-  const { id } = req.query
-  const appUserDoc = await app.jlinx.get(id)
-  await appUserDoc.waitForUpdate()
-  await appUserDoc.update()
-  if (appUserDoc.length === 1){
+  const { id: appUserId } = req.query
+  const appUser = await app.jlinx.get(appUserId)
+
+  console.log(
+    'WAITING FOR AppUser offering to be accepted',
+    appUser,
+  )
+  appUser.update()
+
+
+  // const appUserDoc = await app.jlinx.get(id)
+  await appUser.waitForUpdate()
+  await appUser.update()
+  console.log(
+    'AppUser UPDATED!',
+    appUser,
+    await appUser.value()
+  )
+
+
+  if (appUser.length === 1){
     res.status(400).end()
   }
-  const appUserE2 = await appUserDoc.getJson(1)
+  const appUserE2 = await appUser.getJson(1)
   console.log({ appUserE2 })
 
   let user
@@ -176,24 +197,35 @@ router.get('/signup-with-jlinx/wait', async (req, res) => {
 
 router.post('/signup-with-jlinx/followup', async (req, res) => {
   console.log('BODY', req.body)
-  const {
-    appUserId,
-    appAccountId,
-    signupSecret
-  } = req.body
-  const appUser = await app.jlinx.get(appUserId)
-  const appUserValue = await appUser.getJson(0)
+  const { appAccountId } = req.body
+  console.log('signup-with-jlinx/followup', { appAccountId })
   const appAccount = await app.jlinx.get(appAccountId)
-  const appAccountValue = await appAccount.getJson(0)
+  appAccount.update()
+  console.log('signup-with-jlinx/followup', { appAccount })
+
+  const { appUserId } = appAccount
+  const appUser = await app.jlinx.get(appUserId)
+  appUser.update()
+
   console.log({
-    appUser: appUserValue,
-    appAccount: appAccountValue,
+    appAccount,
+    appUser,
   })
 
+  // const appUserValue = await appUser.getJson(0)
+  // const appAccount = await app.jlinx.get(appAccountId)
+  // const appAccountValue = await appAccount.getJson(0)
+  // console.log({
+  //   appUser: appUserValue,
+  //   appAccount: appAccountValue,
+  // })
+
   if (
-    appAccountValue &&
-    appAccountValue.appUser === appUser.id &&
-    appAccountValue.signupSecret === appUserValue.signupSecret
+    appUser.appAccountId === appAccountId &&
+    appUser.signupSecret === appAccount.signupSecret
+    // appAccountValue &&
+    // appAccountValue.appUser === appUser.id &&
+    // appAccountValue.signupSecret === appUserValue.signupSecret
   ){
     // create user record
     const user = await app.users.create({
