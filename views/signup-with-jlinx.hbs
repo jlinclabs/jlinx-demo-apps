@@ -20,6 +20,8 @@
     console.log('signup completed', response)
     if (response.status === 200){
       window.location = '/'
+    }else{
+      console.error('WAIT FAILED', response)
     }
   })().catch(console.error)
 </script>

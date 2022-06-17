@@ -156,38 +156,31 @@ router.post('/signup-with-jlinx', async (req, res) => {
 router.get('/signup-with-jlinx/wait', async (req, res) => {
   const { id: appUserId } = req.query
   const appUser = await app.jlinx.get(appUserId)
-
-  console.log(
-    'WAITING FOR AppUser offering to be accepted',
-    appUser,
-  )
-  appUser.update()
-
-
-  // const appUserDoc = await app.jlinx.get(id)
-  await appUser.waitForUpdate()
   await appUser.update()
-  console.log(
-    'AppUser UPDATED!',
-    appUser,
-    await appUser.value()
-  )
 
-
-  if (appUser.length === 1){
-    res.status(400).end()
+  while (appUser.state !== 'open'){
+    console.log(
+      'WAITING FOR AppUser offering to be accepted',
+      appUser,
+    )
+    await appUser.waitForUpdate()
+    await appUser.update()
   }
-  const appUserE2 = await appUser.getJson(1)
-  console.log({ appUserE2 })
+
+  console.log(
+    'AppUser just opened!',
+    appUser,
+    appUser.userMetadata,
+  )
+  const { userId } = appUser.userMetadata
 
   let user
-  if (appUserE2 && appUserE2.userId){
-    user = await app.users.findById(appUserE2.userId)
-  }
+  if (userId) user = await app.users.findById(userId)
+
   console.log({ user })
   if (user){
     // login user
-    req.session.userId = user.id
+    req.session.userId =userId
     console.log('SIGNUP COMPLETE SUCCEESS', req.session)
     res.status(200).end()
   }else{
@@ -196,50 +189,62 @@ router.get('/signup-with-jlinx/wait', async (req, res) => {
 })
 
 router.post('/signup-with-jlinx/followup', async (req, res) => {
+  try{
   console.log('BODY', req.body)
   const { appAccountId } = req.body
   console.log('signup-with-jlinx/followup', { appAccountId })
   const appAccount = await app.jlinx.get(appAccountId)
-  appAccount.update()
-  console.log('signup-with-jlinx/followup', { appAccount })
-
-  const { appUserId } = appAccount
-  const appUser = await app.jlinx.get(appUserId)
-  appUser.update()
-
-  console.log({
+  await appAccount.update()
+  console.log('signup-with-jlinx/followup', {
     appAccount,
-    appUser,
+    _value: appAccount._value
   })
 
-  // const appUserValue = await appUser.getJson(0)
-  // const appAccount = await app.jlinx.get(appAccountId)
-  // const appAccountValue = await appAccount.getJson(0)
-  // console.log({
-  //   appUser: appUserValue,
-  //   appAccount: appAccountValue,
-  // })
+  const { appUserId } = appAccount
+  console.log('signup-with-jlinx/followup', { appUserId })
+  if (!appUserId){
+    throw new Error(`unable to find appUserId`)
+  }
+
+  const appUser = await app.jlinx.get(appUserId)
+  await appUser.update()
+
+  console.log('\n\n\nFINIALIZING NEW USER ACCOUNT :D', {
+    appAccount,
+    appUser,
+    'appAccount.appUserId': appAccount.appUserId,
+    'appUser.id': appUser.id,
+    'appAccount.signupSecret': appAccount.signupSecret,
+    'appUser.signupSecret': appUser.signupSecret,
+  })
 
   if (
-    appUser.appAccountId === appAccountId &&
-    appUser.signupSecret === appAccount.signupSecret
-    // appAccountValue &&
-    // appAccountValue.appUser === appUser.id &&
-    // appAccountValue.signupSecret === appUserValue.signupSecret
+    appAccount.appUserId === appUser.id &&
+    appAccount.signupSecret === appUser.signupSecret
   ){
     // create user record
     const user = await app.users.create({
       jlinxAppUserId: appUserId,
       // other data can go here
     })
-    await appUser.appendJson({
+    await appUser.openAccount({
       appAccountId,
-      userId: user.id,
+      userMetadata: {
+        userId: user.id,
+      },
     })
     // create session in the other tab that was waiting for us
     res.status(200).json({})
   }else{
     res.status(400).json({})
+  }
+  }catch(error){
+    console.error('signup-with-jlinx/followup ERROR', error)
+    res.status(500).json({
+      error: `${error}`,
+      trace: error.trace,
+      stack: error.stack,
+    })
   }
 })
 
