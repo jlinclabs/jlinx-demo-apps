@@ -1,4 +1,5 @@
 const Path = require('path')
+const Debug = require('debug')
 const { URL } = require('url')
 const crypto = require('crypto')
 const express = require('express')
@@ -11,6 +12,8 @@ const jwt = require('jsonwebtoken')
 const QRCode = require('qrcode')
 const { now, createRandomString } = require('jlinx-util')
 const requestInfo = require('request-info')
+
+const debug = Debug('jlinx:demo-apps')
 
 const app = express()
 module.exports = app
@@ -76,7 +79,7 @@ app.use(router)
 
 router.use('*', async (req, res, next) => {
   const { session } = req
-  console.log('SESSION', session)
+  debug('SESSION', session)
   session.touch()
   let currentUser
   if (session.userId){
@@ -87,7 +90,7 @@ router.use('*', async (req, res, next) => {
       return res.status(401).redirect('/')
     }
   }
-  console.log({ currentUser })
+  debug({ currentUser })
 
   Object.assign(req, {
     currentUser
@@ -96,18 +99,17 @@ router.use('*', async (req, res, next) => {
     currentUser,
   })
 
-  console.log('REQ METHOD', [req.method])
   if (
     currentUser &&
     !currentUser.username &&
     req.method === 'GET' &&
     req.url !== '/logout'
   ){
+    // TODO move to redirect
     return res.render('complete-account', {
       destination: req.url,
     })
   }
-
   next()
 })
 
@@ -116,7 +118,6 @@ router.get('/', async (req, res) => {
     users: await app.users.all(),
   })
 })
-
 
 router.get('/signup', (req, res) => {
   res.render('signup')
@@ -127,17 +128,13 @@ router.post('/signup-with-jlinx', async (req, res) => {
     '/signup-with-jlinx/followup',
     `${req.protocol}://${req.get('host')}`
   ).toString()
-  // const followupUrl = req.url + '/signup-with-jlinx/followup'
+
   const appUser = await app.jlinx.createAppUser({
     followupUrl,
   })
   appUser.update()
-  console.log(
-    '\n\n!!!CREATED APP USER',
-    appUser,
-    await appUser._value
-  )
-  // TODO persist appUser in postgres
+  debug('created appUser', appUser)
+  // TODO persist appUser in postgres?
   const qrcodeDataUri = await QRCode.toDataURL(appUser.id)
   res.render('signup-with-jlinx', {
     appUserId: appUser.id,
@@ -150,8 +147,9 @@ router.get('/signup-with-jlinx/wait', async (req, res) => {
   const appUser = await app.jlinx.get(appUserId)
   await appUser.update()
 
+  // wait for the user to be created by a POST to /signup-with-jlinx/followup
   while (appUser.state !== 'open'){
-    console.log(
+    debug(
       'WAITING FOR AppUser offering to be accepted',
       appUser,
     )
@@ -159,7 +157,7 @@ router.get('/signup-with-jlinx/wait', async (req, res) => {
     await appUser.update()
   }
 
-  console.log(
+  debug(
     'AppUser just opened!',
     appUser,
     appUser.userMetadata,
@@ -169,13 +167,18 @@ router.get('/signup-with-jlinx/wait', async (req, res) => {
   let user
   if (userId) user = await app.users.findById(userId)
 
-  console.log({ user })
+  debug({ user })
   if (user){
     // login user
-    req.session.userId =userId
-    console.log('SIGNUP COMPLETE SUCCEESS', req.session)
+    req.session.userId = userId
+    debug('SIGNUP WITH JLINX SUCCEESS', req.session)
     res.status(200).end()
   }else{
+    debug('SIGNUP WITH JLINX FAIL', {
+      userId,
+      user,
+      session: req.session,
+    })
     res.status(400).end()
   }
 })
@@ -259,18 +262,58 @@ router.post('/login', async (req, res) => {
     await appUser.update()
     console.log('POST /login', 'requesting session for', appUser)
     const sourceInfo = requestInfo(req)
-    await appUser.requestSession({
+    const sessionRequestId = await appUser.requestSession({
       sourceInfo: {
         ip: sourceInfo.ip,
-        ua: sourceInfo.ua,
+        browser: sourceInfo.ua.browser,
+        os: sourceInfo.ua.os,
       }
     })
-    res.render('login-with-jlinx')
+    debug({ sessionRequestId })
+    res.render('login-with-jlinx', {
+      // appUserId: appUser.id,
+      username,
+      sessionRequestId,
+      destination: '/',
+    })
   // else if (user has a password)
     // then render a page prompting for a password
   }else{
     res.render('login-with-password')
   }
+})
+
+router.get('/login-with-jlinx/wait', async (req, res) => {
+
+  const { username, sessionRequestId } = req.query
+  const user = await app.users.findByUsername(username)
+  const appUser = await app.jlinx.get(user.jlinxAppUserId)
+  await appUser.update()
+  // const sessionRequests = await appUser.getSessionRequests()
+  // const sessionRequest = sessionRequests.find(sr => sr.sessionRequestId === sessionRequestId)
+  // debug({ sessionRequest })
+  // if (!sessionRequest){
+  //   throw new Error(`bad sessionRequestId ${sessionRequestId}`)
+  // }
+
+  const appAccount = await app.jlinx.get(appUser.appAccountId)
+  await appAccount.update()
+  debug('login-with-jlinx/wait', { appAccount, sessionRequestId })
+
+  let resolution
+  while (true) {
+    resolution = await appAccount.getSessionRequestResolution(sessionRequestId)
+    debug('login-with-jlinx/wait', { sessionRequestId, resolution })
+    if (resolution) break
+    await appAccount.waitForUpdate()
+    await appAccount.update()
+  }
+
+  if (resolution.accepted){
+    req.session.userId = user.id
+  }
+
+  res.status(200).end()
 })
 
 router.get('/logout', (req, res) => {
