@@ -46,9 +46,11 @@ app.engine('hbs', hbs.express4({
 app.set('view engine', 'hbs')
 app.set('views', __dirname + '/views')
 app.set('trust proxy', true) // TODO review this. did it to get req.ip
+
 Object.assign(app.locals, {
   appName,
   appColor: app.config.color,
+  otherSites: app.config.otherSites,
   // TODO move this static lists
   // partnerApps: app.config.partnerApps,
 })
@@ -316,9 +318,34 @@ router.get('/login-with-jlinx/wait', async (req, res) => {
   res.status(200).end()
 })
 
+router.get('/jlinx/login/onetime/:jlinxAppUserId/:token', async (req, res) => {
+  const { jlinxAppUserId, token } = req.params
+  debug('onetime-login', { jlinxAppUserId, token })
+  const user = await app.users.findBy({ jlinxAppUserId })
+  // const appUser = await app.jlinx.get(appUserId)
+  if (true){ // temp cheat
+    req.session.userId = user.id
+  }
+  res.redirect('/')
+})
+
 router.get('/logout', (req, res) => {
   req.session.destroy()
   res.redirect('/')
+})
+
+router.post('/jlinx/login/to-site/:domain', async (req, res) => {
+  const { domain } = req.params
+  // fetch domain's public key
+  const url = await app.jlinx.loginToOtherSite({
+    domain
+  })
+  // res.redirect(`https://${domain}/jlinc/login`)
+  res.redirect(url)
+})
+
+router.get('/jlinx/login/from-site/:something', async (req, res) => {
+
 })
 
 router.get('/@:username', async (req, res) => {
