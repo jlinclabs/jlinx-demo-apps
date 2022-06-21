@@ -7,7 +7,7 @@ const Router = require("express-promise-router")
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const expressSession = require('express-session')
-const hbs = require('express-hbs')
+const expressHandlebars = require('express-handlebars')
 const jwt = require('jsonwebtoken')
 const QRCode = require('qrcode')
 const { now, createRandomString } = require('jlinx-util')
@@ -24,9 +24,6 @@ app.users = require('./models/User')
 
 const appName = app.config.name
 
-hbs.handlebars.registerHelper('toJSON', object =>
-  new hbs.handlebars.SafeString(JSON.stringify(object, null, 2))
-)
 
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -39,10 +36,19 @@ app.use(expressSession({
 }))
 
 // VIEWS
-app.engine('hbs', hbs.express4({
+const hbs = expressHandlebars.create({
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+    allowProtoMethodsByDefault: true,
+  },
+  extname: '.hbs',
   partialsDir: __dirname + '/views/partials',
   defaultLayout: __dirname + '/views/layout/default.hbs',
-}))
+})
+hbs.handlebars.registerHelper('toJSON', object =>
+  new hbs.handlebars.SafeString(JSON.stringify(object, null, 2))
+)
+app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs')
 app.set('views', __dirname + '/views')
 app.set('trust proxy', true) // TODO review this. did it to get req.ip
@@ -51,13 +57,9 @@ Object.assign(app.locals, {
   appName,
   appColor: app.config.color,
   otherSites: app.config.otherSites,
-  // TODO move this static lists
-  // partnerApps: app.config.partnerApps,
 })
 
 app.start = async function start(){
-  // await app.pg.connect()
-  // await app.hl.connect()
   const startHttpServer = () =>
     new Promise((resolve, reject) => {
       app.server = app.listen(app.config.port, error => {
@@ -68,7 +70,6 @@ app.start = async function start(){
     })
 
   await Promise.all([
-    // app.sequelize.authenticate(),
     app.pg.ready(),
     app.jlinx.ready(),
     startHttpServer()
@@ -362,7 +363,6 @@ router.get('/@:username', async (req, res) => {
   debug(`GET /@${username}`, { user, appUser })
   res.render('profile', {
     username, itsUs, user, appUser,
-    appUserId: appUser && appUser.id,
   })
 })
 
