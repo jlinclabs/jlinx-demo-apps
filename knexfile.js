@@ -1,5 +1,5 @@
-const env = require('./environment')
-const connection = env.postgresDatabaseUrl
+require('./environment')
+const connection = process.env.DATABASE_URL
 
 module.exports = {
 

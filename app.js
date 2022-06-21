@@ -7,6 +7,7 @@ const Router = require("express-promise-router")
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const expressSession = require('express-session')
+const pgSession = require('connect-pg-simple')(expressSession)
 const expressHandlebars = require('express-handlebars')
 const jwt = require('jsonwebtoken')
 const QRCode = require('qrcode')
@@ -30,6 +31,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json({ }))
 app.use(cookieParser())
 app.use(expressSession({
+  store: new pgSession({}),
   secret: app.config.sessionSecret,
   resave: true,
   saveUninitialized: true,

@@ -1,3 +1,5 @@
+const fs = require('fs/promises')
+
 exports.up = async function(knex) {
   await knex.schema.createTable('users', function (table) {
     table.increments('id').primary()
@@ -5,15 +7,13 @@ exports.up = async function(knex) {
     table.string('jlinx_app_user_id')
     table.timestamps()
   })
-  await knex.schema.createTable('tweets', function (table) {
-    table.increments().primary()
-    table.integer('user_id').notNullable().references('users.id')
-    table.string('content')
-    table.timestamps()
-  })
+
+  // CREATE TABLE "session"
+  const sql = await fs.readFile(require.resolve('connect-pg-simple/table.sql'))
+  await knex.schema.raw(`${sql}`)
 }
 
 exports.down = async function(knex) {
-  try{ await knex.schema.dropTable('tweets') } catch(e){ }
-  try{ await knex.schema.dropTable('users') } catch(e){ }
+  await knex.schema.dropTable('session')
+  await knex.schema.dropTable('users')
 }

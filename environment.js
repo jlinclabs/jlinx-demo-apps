@@ -9,6 +9,7 @@ require('dotenv').config({
 
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
+console.log(`NODE_ENV=${process.env.NODE_ENV} APP_DIR=${APP_DIR}`)
 const config = module.exports = {
   APP_DIR,
   appName: process.env.APP_NAME,
@@ -18,7 +19,7 @@ const config = module.exports = {
   jlinxHost: process.env.JLINX_HOST,
   jlinxVaultKey: process.env.JLINX_VAULT_KEY,
   sessionSecret: process.env.SESSION_SECRET,
-  postgresDatabaseUrl: process.env.POSTGRES_DATABASE_URL,
+  databaseUrl: process.env.DATABASE_URL,
   otherSites: [
     {
       name: "CatWalkers",
@@ -34,5 +35,3 @@ const config = module.exports = {
     },
   ].filter(site => site.name !== process.env.APP_NAME)
 }
-
-console.log({ APP_DIR, envPath, config })
