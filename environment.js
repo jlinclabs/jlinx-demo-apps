@@ -10,7 +10,25 @@ require('dotenv').config({
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
 console.log(`NODE_ENV=${process.env.NODE_ENV} APP_DIR=${APP_DIR}`)
-const config = module.exports = {
+
+const tld = process.env.NODE_ENV = 'production' ? 'jlinc.io' : jlinx.test
+
+const allSites = [
+  {
+    name: 'CatWalkers',
+    domain: `cat-walkers.${tld}`
+  },
+  {
+    name: 'BadBirders',
+    domain: `bad-birders.${tld}`
+  },
+  {
+    name: 'DopeDogs',
+    domain: `dope-dogs.${tld}`
+  },
+]
+
+module.exports = {
   APP_DIR,
   appName: process.env.APP_NAME,
   appColor: process.env.APP_COLOR,
@@ -20,18 +38,6 @@ const config = module.exports = {
   jlinxVaultKey: process.env.JLINX_VAULT_KEY,
   sessionSecret: process.env.SESSION_SECRET,
   databaseUrl: process.env.DATABASE_URL,
-  otherSites: [
-    {
-      name: "CatWalkers",
-      domain: "cat-walkers.jlinx.test"
-    },
-    {
-      name: "BadBirders",
-      domain: "bad-birders.jlinx.test"
-    },
-    {
-      name: "DopeDogs",
-      domain: "dope-dogs.jlinx.test"
-    },
-  ].filter(site => site.name !== process.env.APP_NAME)
+  otherSites: allSites.filter(site => site.name !== process.env.APP_NAME)
 }
+

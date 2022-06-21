@@ -1,4 +1,5 @@
 const knexfile = require('./knexfile.js')
+console.log('??', knexfile[process.env.NODE_ENV || 'development'])
 const knex = require('knex')(
   knexfile[process.env.NODE_ENV || 'development']
 )
