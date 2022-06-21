@@ -352,10 +352,17 @@ router.get('/@:username', async (req, res) => {
   const { currentUser } = res.locals
   const { username } = req.params
   const itsUs = currentUser && currentUser.username === username
-  const user = itsUs ? currentUser : (await app.users.get(username))
-  const hyperlincEvents = user && await app.users._getAllHyperlincEvents(username)
+  const user = itsUs ? currentUser : (await app.users.findBy({ username }))
+
+  let appUser
+  if (user.jlinxAppUserId) {
+    appUser = await app.jlinx.get(user.jlinxAppUserId)
+    await appUser.update()
+  }
+  debug(`GET /@${username}`, { user, appUser })
   res.render('profile', {
-    username, itsUs, user, hyperlincEvents
+    username, itsUs, user, appUser,
+    appUserId: appUser && appUser.id,
   })
 })
 

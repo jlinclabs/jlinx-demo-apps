@@ -1,15 +1,18 @@
 <h1>@{{username}}</h1>
 
 {{#if user}}
+  <dl>
+    <dt>Real Name:</dt>
+    <dd>{{user.realname}}</dd>
+    <dt>Email:</dt>
+    <dd>{{user.email}}</dd>
+    <dt>Jlinx AppUser Id:</dt>
+    <dd>{{user.jlinxAppUserId}}</dd>
+    <dt>Created:</dt>
+    <dd>{{user.created_at}}</dd>
+  </dl>
+
   {{#if itsUs}}
-    <dl>
-      <dt>Hyperlinc ID:</dt>
-      <dd>{{user.hyperlinc_id}}</dd>
-      <dt>Jlinc DID:</dt>
-      <dd>{{user.jlinc_did}}</dd>
-    </dl>
-
-
     <form method="post" action="/profile">
       <p>
         <label for="realname-input">Real Name</label><br/>
@@ -33,26 +36,17 @@
         <button type="submit" class="btn btn-primary">UPDATE</button>
       </p>
     </form>
-  {{else}}
-    <dl>
-      <dt>Real Name:</dt>
-      <dd>{{user.realname}}</dd>
-      <dt>Email:</dt>
-      <dd>{{user.email}}</dd>
-      <dt>Created:</dt>
-      <dd>{{user.created_at}}</dd>
-    </dl>
   {{/if}}
 
-  <h4>Hyperlinc Events</h4>
-  {{#each hyperlincEvents}}
-    <fieldset>
-      <legend>{{eventType}}</legend>
-      {{at}}
-      <pre>{{toJSON this}}</pre>
-    </fieldset>
-
-  {{/each}}
+  {{#if appUser}}
+    <h4>Jlinx App User</h4>
+    <dl>
+      <dt>AppUser Id:</dt>
+      <dd>{{appUser.id}} / {{appUserId}}</dd>
+      <dt>AppAccount Id:</dt>
+      <dd>{{appUser.appAccountId}}</dd>
+    </dl>
+  {{/if}}
 
 {{else}}
   <i>user not found</i>
