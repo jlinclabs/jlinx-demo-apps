@@ -59,6 +59,7 @@ tmp/*
 
 # dotenv
 .env
+prod.env
 
 # servers  development config
 servers/development.config.js
