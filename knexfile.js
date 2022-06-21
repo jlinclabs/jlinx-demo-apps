@@ -1,23 +1,12 @@
 require('./environment')
 const connection = process.env.DATABASE_URL
-console.log({ connection })
+console.log('process.env.NODE_ENV', process.env.NODE_ENV)
 
 module.exports = {
-
-  development: {
-    client: 'pg',
-    connection,
-    debug: true,
+  client: 'postgresql',
+  connection,
+  pool: {
+    min: 2,
+    max: 10
   },
-
-  staging: {
-    client: 'pg',
-    connection,
-  },
-
-  production: {
-    client: 'pg',
-    connection,
-  }
-
 };
