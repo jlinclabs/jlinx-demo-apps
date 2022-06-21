@@ -1,6 +1,6 @@
 const Path = require('path')
 const b4a = require('b4a')
-const appConfig = require('./appConfig')
+const appConfig = require('./environment')
 const JlinxClient = require('jlinx-client')
 
 console.log({appConfig})

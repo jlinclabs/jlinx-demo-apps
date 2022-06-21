@@ -17,12 +17,12 @@ const debug = Debug('jlinx:demo-apps')
 
 const app = express()
 module.exports = app
-app.config = require('./appConfig')
+app.config = require('./environment')
 app.jlinx = require('./jlinx')
 app.pg = require('./postgresql')
 app.users = require('./models/User')
 
-const appName = app.config.name
+const appName = app.config.appName
 
 
 app.use(express.static(__dirname + '/public'));
@@ -55,7 +55,7 @@ app.set('trust proxy', true) // TODO review this. did it to get req.ip
 
 Object.assign(app.locals, {
   appName,
-  appColor: app.config.color,
+  appColor: app.config.appColor,
   otherSites: app.config.otherSites,
 })
 

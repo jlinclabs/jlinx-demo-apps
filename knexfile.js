@@ -1,5 +1,5 @@
-const appConfig = require('./appConfig')
-const connection = appConfig.postgresDatabaseUrl
+const env = require('./environment')
+const connection = env.postgresDatabaseUrl
 
 module.exports = {
 
