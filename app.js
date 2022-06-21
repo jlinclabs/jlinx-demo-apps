@@ -83,7 +83,7 @@ router.use('*', async (req, res, next) => {
   session.touch()
   let currentUser
   if (session.userId){
-    currentUser = await app.users.findById(session.userId)
+    currentUser = await app.users.findBy({ id: session.userId })
     if (!currentUser){
       console.log('DESTROYING SESSION')
       session.destroy()
@@ -165,7 +165,7 @@ router.get('/signup-with-jlinx/wait', async (req, res) => {
   const { userId } = appUser.userMetadata
 
   let user
-  if (userId) user = await app.users.findById(userId)
+  if (userId) user = await app.users.findBy({ userId })
 
   debug({ user })
   if (user){
@@ -255,7 +255,7 @@ router.get('/login', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   const { username } = req.body
-  const user = await app.users.findByUsername(username)
+  const user = await app.users.findBy({ username })
   console.log('POST /login', { user })
   if (user.jlinxAppUserId){
     const appUser = await app.jlinx.get(user.jlinxAppUserId)
@@ -286,7 +286,7 @@ router.post('/login', async (req, res) => {
 router.get('/login-with-jlinx/wait', async (req, res) => {
 
   const { username, sessionRequestId } = req.query
-  const user = await app.users.findByUsername(username)
+  const user = await app.users.findBy({ username })
   const appUser = await app.jlinx.get(user.jlinxAppUserId)
   await appUser.update()
   // const sessionRequests = await appUser.getSessionRequests()

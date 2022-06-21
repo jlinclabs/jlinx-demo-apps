@@ -13,18 +13,17 @@ class User {
     return !!(user && await user.verifyPassword(password))
   }
 
-  static async findById(userId){
+  static async findBy(opts){
+    const where = {}
+    if ('id' in opts) where.id = opts.id
+    if ('userId' in opts) where.id = opts.userId
+    if ('username' in opts)
+      where.username = opts.username
+    if ('jlinxAppUserId' in opts)
+      where.jlinx_app_user_id = opts.jlinxAppUserId
     const [ record ] = await knex('users')
       .select('*')
-      .where({ id: userId })
-      .limit(1)
-    if (record) return new User(record)
-  }
-
-  static async findByUsername(username){
-    const [ record ] = await knex('users')
-      .select('*')
-      .where({ username })
+      .where(where)
       .limit(1)
     if (record) return new User(record)
   }
