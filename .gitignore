@@ -72,3 +72,4 @@ dev/apps/*/tmp
 dev/apps/*/jlinx
 dev/apps/*/jlinx.vault
 
+./config.json
