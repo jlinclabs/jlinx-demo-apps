@@ -325,10 +325,25 @@ router.get('/jlinx/login/onetime/:jlinxAppUserId/:token', async (req, res) => {
   const { jlinxAppUserId, token } = req.params
   debug('onetime-login', { jlinxAppUserId, token })
   const user = await app.users.findBy({ jlinxAppUserId })
-  // const appUser = await app.jlinx.get(appUserId)
-  if (true){ // temp cheat
+  if (!user) {
+    throw new Error(`unable to find user for jlinxAppUserId="${jlinxAppUserId}"`)
+  }
+  if (req.session.userId !== user.id){
+    const appUser = await app.jlinx.get(jlinxAppUserId)
+    await appUser.update()
+
+    const sourceInfo = requestInfo(req)
+    await appUser.redeemOnetimeLoginLink({
+      token,
+      sourceInfo: {
+        ip: sourceInfo.ip,
+        browser: sourceInfo.ua.browser,
+        os: sourceInfo.ua.os,
+      }
+    })
     req.session.userId = user.id
   }
+
   res.redirect('/')
 })
 
