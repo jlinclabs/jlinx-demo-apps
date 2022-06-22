@@ -28,7 +28,7 @@
     "express-handlebars": "^6.0.6",
     "express-promise-router": "^4.1.1",
     "express-session": "^1.17.3",
-    "jlinx-client": "github:jlinclabs/jlinx-client#dc0af6d53b1924c4985dfa765e695daac5064c12",
+    "jlinx-client": "github:jlinclabs/jlinx-client#6174c47c6843bd9efdc05c5bbe830ff597c4cf7d",
     "jsonwebtoken": "^8.5.1",
     "knex": "^2.0.0",
     "passport-local": "^1.0.0",
