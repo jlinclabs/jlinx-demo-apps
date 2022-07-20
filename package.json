@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "./scripts/dev"
+    "dev": "./scripts/dev-start-all"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +14,9 @@
     "express": "^4.18.1"
   },
   "devDependencies": {
-    "concurrently": "^7.3.0"
+    "concurrently": "^7.3.0",
+    "dotenv": "^16.0.1",
+    "dotenv-cli": "^6.0.0",
+    "find-open-port": "^2.0.3"
   }
 }

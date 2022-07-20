@@ -1,0 +1,11 @@
+APP_NAME=BadBirders
+APP_COLOR="#00ffff"
+PORT=4581
+URL=https://bad-birders.jlinx.test
+HOST=bad-birders.jlinx.test
+JLINX_HOST=https://testnet1.jlinx.test
+JLINX_VAULT_KEY=3a7f4af663356319c9c22ec213e37c33efde8db9d8bed13b869ae93a745c750c
+JLINX_VAULT_PATH=/Volumes/Work/jlinc/jlinx/demo-apps-next/dev/apps/bad-birders/jlinx.vault
+NEXTJS_DIST_DIR=/Volumes/Work/jlinc/jlinx/demo-apps-next/dev/apps/bad-birders/dist
+SESSION_SECRET=i8fOv3cKg3xqryxNEtfbfNeDzkWLc54bGzHbiFRbVdh
+DATABASE_URL=postgresql://deadlyicon@localhost/jlinx-demo-bad-birders

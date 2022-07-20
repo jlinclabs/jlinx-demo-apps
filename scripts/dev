@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-concurrently --kill-others-on-fail \
-  --names "CLIENT,SERVER" \
-  "cd client && npm run start" \
-  "nodemon server.js"

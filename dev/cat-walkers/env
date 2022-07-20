@@ -1,0 +1,10 @@
+APP_NAME=CatWalkers
+APP_COLOR="#fa8072"
+PORT=4580
+URL=https://cat-walkers.jlinx.test
+HOST=cat-walkers.jlinx.test
+JLINX_HOST=https://testnet1.jlinx.test
+JLINX_VAULT_KEY=ebdea2b46211d1583712feee504e6551fcdc01deff806364c3af074f9397d6bc
+JLINX_VAULT_PATH=/Volumes/Work/jlinc/jlinx/demo-apps-next/dev/apps/cat-walkers/jlinx.vault
+SESSION_SECRET=biFRbVdhNeDzkWLc54bi8fOv3cKg3xqryxNEtfbfGzH
+DATABASE_URL=postgresql://deadlyicon@localhost/jlinx-demo-cat-walkers
