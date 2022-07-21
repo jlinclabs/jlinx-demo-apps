@@ -1,6 +1,7 @@
 require('./environment')
-const express = require('express')
-const bodyParser = require('body-parser')
+import express from 'express'
+import bodyParser from 'body-parser'
+import Session from './Session'
 
 const app = express()
 
@@ -14,6 +15,15 @@ app.get('/api/status', (req, res) => {
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('client/build'))
 }
+
+app.use('/api', async (req, res, next) => {
+  req.session = await Session.open(req, res)
+  next()
+})
+
+app.get('/api/views/*viewId', async (req, res, next) => {
+
+})
 
 const server = app.listen(process.env.PORT, () => {
   const { port } = server.address()
