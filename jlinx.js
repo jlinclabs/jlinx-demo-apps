@@ -1,8 +1,7 @@
 import Path from 'path'
 import b4a from 'b4a'
 import JlinxClient from 'jlinx-client'
-// const exitHook = require('exit-hook')
-// import exitHook from 'exit-hook'
+import exitHook from 'exit-hook'
 
 const {
   JLINX_HOST,
@@ -20,8 +19,4 @@ console.log({jlinx})
 
 export default jlinx
 
-// exitHook(() => { jlinx.destroy() });
-import('exit-hook').then(fuck => {
-  console.log(fuck)
-})
-// exitHook(() => { jlinx.destroy() });
+exitHook(() => { jlinx.destroy() });

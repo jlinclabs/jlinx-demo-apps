@@ -1,8 +1,8 @@
 import pathToRegexp from 'path-to-regexp'
-import users from './usersResource'
-import session from './sessionResource'
-import identifiers from './identifiersResource'
-import contracts from './contractsResource'
+import users from './usersResource.js'
+import session from './sessionResource.js'
+import identifiers from './identifiersResource.js'
+import contracts from './contractsResource.js'
 
 const resources = {
   users,

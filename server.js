@@ -1,11 +1,11 @@
-require('./environment')
+import './environment.js'
 import express from 'express'
 import bodyParser from 'body-parser'
 import Router from 'express-promise-router'
 
 
-import Session from './Session'
-import { getView, takeAction } from './resources'
+import Session from './Session.js'
+import { getView, takeAction } from './resources/index.js'
 
 const app = express()
 

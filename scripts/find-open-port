@@ -1,3 +1,0 @@
-const findPort = require('find-open-port');
-
-findPort().then(port => { console.log(port) })

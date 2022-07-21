@@ -1,5 +1,5 @@
-import db from '../prisma/client'
-import jlinx from '../jlinx'
+import db from '../prisma/client.js'
+import jlinx from '../jlinx.js'
 import {
   createSigningKeyPair,
   signingKeyToDidDocument,

@@ -2,7 +2,7 @@
   "name": "demo-apps-create-react-app",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "./scripts/dev-start-all"
   },
@@ -10,9 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@babel/core": "^7.18.9",
-    "@babel/node": "^7.18.9",
-    "@babel/preset-env": "^7.18.9",
     "@prisma/client": "^4.1.0",
     "b4a": "^1.5.3",
     "bcrypt": "^5.0.1",
@@ -24,7 +21,6 @@
     "jlinx-client": "github:jlinclabs/jlinx-client#3ed7d4b065b4bd14b9430f4b6a5ae447cbf6b745"
   },
   "devDependencies": {
-    "@babel/plugin-transform-modules-commonjs": "^7.18.6",
     "concurrently": "^7.3.0",
     "dotenv": "^16.0.1",
     "dotenv-cli": "^6.0.0",

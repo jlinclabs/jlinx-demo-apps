@@ -1,5 +1,5 @@
 import Cookies from 'cookies'
-import sessionResource from './resources/sessionResource'
+import sessionResource from './resources/sessionResource.js'
 const COOKIE_NAME = 'session-id'
 
 export default class Session {
