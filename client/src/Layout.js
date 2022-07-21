@@ -14,10 +14,8 @@ import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined'
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined'
 
-// import { useCurrentUser } from '../lib/session'
+import { useCurrentUser } from './resources/session'
 import Link from './components/Link'
-
-const useCurrentUser = () => ({ })
 
 export default function Layout(props) {
   const {

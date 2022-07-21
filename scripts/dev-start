@@ -6,6 +6,6 @@ API_SERVER="http://localhost:${SERVER_PORT}"
 exec concurrently \
   --kill-others \
   --names "SERVER,CLIENT" \
-  "PORT=${SERVER_PORT} nodemon — exec babel-node ./server.js" \
+  "PORT=${SERVER_PORT} nodemon --exec babel-node ./server.js" \
   "cd client && BROWSER=none DANGEROUSLY_DISABLE_HOST_CHECK=true API_SERVER=\"${API_SERVER}\" npm run start"
 

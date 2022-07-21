@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import prisma from '../lib/prisma'
+import prisma from '../prisma/client'
 
 const sessionResource = {
 
@@ -52,6 +52,7 @@ const sessionResource = {
   actions: {
 
     async signup({ session, email, password }){
+      console.log('signup', { session, email, password })
       if (session.userId){
         throw new Error(`please logout first`)
       }

@@ -1,5 +1,5 @@
-import db from '../lib/prisma'
-import jlinx from '../lib/jlinx'
+import db from '../prisma/client'
+import jlinx from '../jlinx'
 
 const contracts = {
   queries: {

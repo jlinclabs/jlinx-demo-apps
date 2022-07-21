@@ -1,3 +1,5 @@
+import prisma from '../prisma/client'
+
 const users = {
   queries: {
 

@@ -29,6 +29,7 @@ export function useCurrentUser({
     ]
   )
   const reload = () => { mutate() }
+  console.log('useCurrentUser', { currentUser })
   return { currentUser, loading, error, mutate, reload }
 }
 

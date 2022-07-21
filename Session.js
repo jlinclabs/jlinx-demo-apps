@@ -8,7 +8,7 @@ export default class Session {
     const session = new Session(req, res)
     if (session.id) await session.reload()
     if (!session.createdAt) {
-      console.log('Session create')
+      console.log('Session create', this.id)
       session._value = await sessionResource.commands.create()
       session._id = session._value.id
       session._cookies.set(COOKIE_NAME, session.id, { httpOnly: true })
@@ -30,17 +30,17 @@ export default class Session {
   get userId(){ return this._value?.userId }
 
   async reload(){
-    console.log('Session reload')
+    console.log('Session reload', this.id)
     this._value = await sessionResource.queries.get(this.id)
   }
 
   async touch(){
-    console.log('Session touch')
+    console.log('Session touch', this.id)
     await sessionResource.commands.touch(this.id)
   }
 
   async delete(){
-    console.log('Session delete')
+    console.log('Session delete', this.id)
     await sessionResource.commands.delete(this.id)
     this._cookies.set(COOKIE_NAME, undefined)
   }
