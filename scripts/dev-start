@@ -1,12 +1,7 @@
 #!/usr/bin/env bash
 
-echo APP_NAME=$APP_NAME
-echo APP_COLOR=$APP_COLOR
-
 SERVER_PORT=$(node ./scripts/find-open-port)
 API_SERVER="http://localhost:${SERVER_PORT}"
-
-echo "API_SERVER=${API_SERVER}"
 
 exec concurrently \
   --kill-others \

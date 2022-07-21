@@ -1,7 +1,6 @@
-APP_NAME=BadBirders
-APP_COLOR="#00ffff"
+REACT_APP_NAME=BadBirders
+REACT_APP_COLOR="#00ffff"
 PORT=4581
-URL=https://bad-birders.jlinx.test
 HOST=bad-birders.jlinx.test
 JLINX_HOST=https://testnet1.jlinx.test
 JLINX_VAULT_KEY=3a7f4af663356319c9c22ec213e37c33efde8db9d8bed13b869ae93a745c750c
