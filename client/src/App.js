@@ -1,18 +1,13 @@
+import { ErrorBoundary } from 'react-error-boundary'
 import Routes from './Routes'
-import ErrorBoundary from './components/ErrorBoundary'
+import AppError from './components/AppError'
+
 export default function App() {
   return (
-    <ErrorBoundary {...{ onError }}>
+    <ErrorBoundary
+      FallbackComponent={AppError}
+    >
       <Routes/>
     </ErrorBoundary>
   )
-}
-
-
-function onError(error){
-  return <div>
-    <h1>APP ERROR</h1>
-    <h2>{error.message}</h2>
-    <pre>{error.stack}</pre>
-  </div>
 }
