@@ -18,7 +18,7 @@
     "exit-hook": "^3.0.0",
     "express": "^4.18.1",
     "express-promise-router": "^4.1.1",
-    "jlinx-client": "github:jlinclabs/jlinx-client#3ed7d4b065b4bd14b9430f4b6a5ae447cbf6b745",
+    "jlinx-client": "github:jlinclabs/jlinx-client#dc861e9296192823e1b5995080a53110107a76d6",
     "node-fetch": "^3.2.9"
   },
   "devDependencies": {

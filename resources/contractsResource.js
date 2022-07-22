@@ -46,9 +46,9 @@ const contracts = {
       // TODO ensure identifierDid exists and is ours
       const contract = await jlinx.contracts.create()
       await contract.offerContract({
-        identifier: identifierDid,
+        offerer: identifierDid,
         contractUrl,
-        signatureDropoffUrl: `://${process.env.HOST}/jlinx/contracts/signatures`
+        signatureDropoffUrl: `${process.env.URL}/api/jlinx/contracts/signatures`
       })
       console.log('CREATED CONTRACT', contract, contract.value)
       await db.contract.create({
@@ -76,28 +76,29 @@ const contracts = {
       console.log('DROPPING OFF SIGNATURE', {
         signatureDropoffUrl: contract.signatureDropoffUrl,
       })
-      const r = await postJSON(
-        contract.signatureDropoffUrl, {
-        signatureId: signature.id
-      })
-      console.log('DROPPED OFF SIGNATURE', r)
-
-      // await db.contract.create({
-      //   data: {
-      //     id: contract.id,
-      //     userId
-      //   },
-      // })
+      await postJSON(
+        contract.signatureDropoffUrl,
+        {
+          signatureId: signature.id,
+        }
+      )
+      await contract.update()
+      console.log('DROPPED OFF SIGNATURE', { contract })
+      // TODO persist a record of this for the current user
       return { signatureId: signature.id }
     },
 
-    async ackSignature({ userId, contractId, signatureId }){
+    async ackSignature({ signatureId }){
+      console.log('ackSignature', { signatureId })
+      const contractParty = await jlinx.contracts.getParty(signatureId)
+      console.log('ackSignature', { contractParty })
+      const { contractId } = contractParty
+      console.log('ackSignature', { contractId })
       const contract = await jlinx.contracts.get(contractId)
       if (!contract) throw new Error(`invalid contractId "${contractId}"`)
       await contract.ackSignerResponse(signatureId)
-      await contract.update() // TODO ensure ackSignerResponse does update
-      console.log('ACKd CONTRACT SIGNATURE', contract)
-      return { id: contract.id }
+      console.log('ACK\'d CONTRACT SIGNATURE', contract)
+      return { contractId }
     },
   },
 
@@ -117,9 +118,9 @@ const contracts = {
         identifierDid,
       })
     },
-    async ackSignature({ currentUser, contractId, signatureId }){
+    async ackSignature({ contractId, signatureId }){
       return await contracts.commands.ackSignature({
-        userId: currentUser.id,
+        // userId: currentUser.id,
         contractId,
         signatureId,
       })

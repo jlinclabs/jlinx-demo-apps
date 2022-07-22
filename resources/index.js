@@ -3,6 +3,7 @@ import users from './usersResource.js'
 import session from './sessionResource.js'
 import identifiers from './identifiersResource.js'
 import contracts from './contractsResource.js'
+import { NotFoundError } from '../errors.js'
 
 const resources = {
   users,

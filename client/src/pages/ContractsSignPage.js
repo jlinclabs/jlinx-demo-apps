@@ -115,27 +115,12 @@ function SignContractOfferingForm({ contractId }){
     {signatureId
       ? <>
         <Typography variant="h2" sx={{mt: 2}}>Signed!</Typography>
-        <Typography variant="h5">Just one more step:</Typography>
-        <Typography variant="h6">
-          Give this Signature ID to the contract offerer:
-        </Typography>
         <Typography paragraph>
           <Link
             to={`${contract.jlinxHost}/${signatureId}/stream`}
             target="_blank"
           >PUBLIC RECORD</Link>
         </Typography>
-        <Box sx={{
-          '> input': {
-            outline: 'none',
-            width: '27em',
-            fontFamily: 'monospace',
-            fontSize: '20px',
-            p: 1,
-          }
-        }}>
-          <input type="text" readOnly value={signatureId} onClick={e => { e.target.select() }}/>
-        </Box>
       </>
       : <>
         <Typography variant="body1" sx={{my: 2}}>

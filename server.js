@@ -17,9 +17,7 @@ if (process.env.NODE_ENV === 'production') {
 // ROUTES
 const router = Router()
 app.use(router)
-
-// router.use(bodyParser.json())
-// router.use(bodyParser.urlencoded({ extended: true }))
+router.use(bodyParser.json())
 
 router.use(async (req, res, next) => {
   req.session = await Session.open(req, res)
@@ -36,11 +34,21 @@ router.get('/api/views/*', async (req, res) => {
   res.json({ value })
 })
 
-router.post('/api/actions/*', bodyParser.json(), async (req, res) => {
+router.post('/api/actions/*', async (req, res) => {
   const actionId = req.params[0]
   const options = req.body || {}
   const result = await takeAction({ actionId, session: req.session, options })
   res.json({ result })
+})
+
+router.post('/api/jlinx/contracts/signatures', async (req, res) => {
+  const { signatureId } = req.body
+  const result = await takeAction({
+    actionId: 'contracts.ackSignature',
+    session: req.session,
+    options: { signatureId },
+  })
+  res.json(result)
 })
 
 router.use((error, req, res, next) => {
