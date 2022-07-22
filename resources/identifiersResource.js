@@ -1,9 +1,7 @@
 import db from '../prisma/client.js'
 import jlinx from '../jlinx.js'
-import {
-  createSigningKeyPair,
-  signingKeyToDidDocument,
-} from 'jlinx-util'
+import { createSigningKeyPair } from 'jlinx-util'
+import Identifiers from 'jlinx-client/Identifiers.js'
 
 const identifiers = {
   queries: {
@@ -14,7 +12,7 @@ const identifiers = {
       console.log({ identifier })
       if (identifier){
         identifier.signingKey = `${did}`.replace(/^did:key:/, '')
-        identifier.didDocument = signingKeyToDidDocument(identifier.signingKey)
+        identifier.didDocument = Identifiers.signingKeyToDidDocument(identifier.signingKey)
       }
       console.log({ identifier })
       return identifier

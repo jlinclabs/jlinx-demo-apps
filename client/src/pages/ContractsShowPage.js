@@ -77,8 +77,6 @@ function Contract({ id }){
       }}>
         <input type="text" readOnly value={id} onClick={e => { e.target.select() }}/>
       </Box>
-
-      <AckContractSignatureForm {...{ contract, reloadContract }}/>
     </>}
 
     {contract.state === 'signed' && <>

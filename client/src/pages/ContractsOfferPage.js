@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
@@ -24,16 +25,15 @@ export default function OfferContractPage({ router }) {
   </Layout>
 }
 
-
-
-function OfferContractForm({ router }){
+function OfferContractForm(){
+  const navigate = useNavigate()
   const [identifiers = []] = useMyIdentifiers()
 
   const [ contractUrl, setContractUrl ] = useState('https://contracts.io/sisa-suyF9tPmVrtuuLn3R4XdzGXMZN6aFfCIXuXwGpAHtCw.md')
   const [ identifierDid, setIdentifierDid ] = useState('')
   const offerContract = useOfferContract({
     onSuccess(contract){
-      router.push(`/contracts/${contract.id}`)
+      navigate(`/contracts/${contract.id}`)
     },
   })
 

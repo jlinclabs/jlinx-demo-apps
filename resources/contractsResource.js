@@ -1,3 +1,4 @@
+import { postJSON } from '../lib/http.js'
 import db from '../prisma/client.js'
 import jlinx from '../jlinx.js'
 
@@ -47,6 +48,7 @@ const contracts = {
       await contract.offerContract({
         identifier: identifierDid,
         contractUrl,
+        signatureDropoffUrl: `://${process.env.HOST}/jlinx/contracts/signatures`
       })
       console.log('CREATED CONTRACT', contract, contract.value)
       await db.contract.create({
@@ -61,12 +63,25 @@ const contracts = {
     async sign({ contractId, userId, identifierDid }){
       const contract = await jlinx.contracts.get(contractId)
       if (!contract) throw new Error(`invalid contractId "${contractId}"`)
+      await contract.update()
+      console.log('SIGNING CONTRACT', { contract })
+
       // TODO ensure valid contract for signing
       // TODO ensure identifierDid is ours
       const signature = await contract.sign({
         identifier: identifierDid,
       })
       console.log('SIGNED CONTRACT', { signature })
+
+      console.log('DROPPING OFF SIGNATURE', {
+        signatureDropoffUrl: contract.signatureDropoffUrl,
+      })
+      const r = await postJSON(
+        contract.signatureDropoffUrl, {
+        signatureId: signature.id
+      })
+      console.log('DROPPED OFF SIGNATURE', r)
+
       // await db.contract.create({
       //   data: {
       //     id: contract.id,

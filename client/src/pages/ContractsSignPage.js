@@ -5,7 +5,6 @@ import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
-import Stack from '@mui/material/Stack'
 import Button from '@mui/material/Button'
 import FormControl from '@mui/material/FormControl'
 import TextField from '@mui/material/TextField'
@@ -18,7 +17,6 @@ import { useMyIdentifiers } from '../resources/identifiers'
 import Layout from '../Layout'
 import Link from '../components/Link'
 import IdentifierProfile from '../components/IdentifierProfile'
-import InspectObject from '../components/InspectObject'
 
 export default function ContractsSignPage() {
   const [search, setSearch] = useSearchParams()
@@ -166,9 +164,5 @@ function SignContractOfferingForm({ contractId }){
         </Box>
       </>
     }
-
-    <hr/>
-    <InspectObject object={contract}/>
-
   </Paper>
 }
