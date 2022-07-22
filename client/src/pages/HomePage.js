@@ -21,13 +21,16 @@ export default function HomePage() {
         </Typography>
         {currentUser ? null : <>
           <Stack spacing={2} mt={3}>
-            <Button variant="contained" component={Link} href="/login">Login</Button>
-            <Button variant="contained" component={Link} href="/signup">Signup</Button>
+            <Button variant="contained" component={Link} to="/login">Login</Button>
+            <Button variant="contained" component={Link} to="/signup">Signup</Button>
           </Stack>
         </>}
+        <BreakThings/>
       </Paper>
     </Container>
   </Layout>
 }
 
-
+function BreakThings(){
+  // throw new Error('boom')
+}

@@ -1,14 +1,18 @@
-import { ThemeProvider, CssBaseline } from '@mui/material'
-import theme from './css/theme'
 import Routes from './Routes'
-
-function App() {
+import ErrorBoundary from './components/ErrorBoundary'
+export default function App() {
   return (
-    <ThemeProvider {...{theme}}>
-      <CssBaseline />
+    <ErrorBoundary {...{ onError }}>
       <Routes/>
-    </ThemeProvider>
+    </ErrorBoundary>
   )
 }
 
-export default App
+
+function onError(error){
+  return <div>
+    <h1>APP ERROR</h1>
+    <h2>{error.message}</h2>
+    <pre>{error.stack}</pre>
+  </div>
+}

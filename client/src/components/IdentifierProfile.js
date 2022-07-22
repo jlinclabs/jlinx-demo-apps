@@ -6,7 +6,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 
 export default function IdentifierProfile({ identifier, sx, ...props }){
-
+  if (!identifier) identifier = '??????????????????????'
   return <ListItemButton
     dense
     sx={{
