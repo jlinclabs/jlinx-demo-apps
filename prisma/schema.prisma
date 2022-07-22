@@ -41,9 +41,7 @@ model Identifier {
 
 model Profile {
   id        String   @id
-  secretKey String
   createdAt DateTime @default(now())
-  value     String
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
 }
