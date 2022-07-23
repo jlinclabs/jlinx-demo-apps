@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+set -x
+
+cd client
+npm i
+../node_modules/.bin/dotenv -e ../.env npm run build

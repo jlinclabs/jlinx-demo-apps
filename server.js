@@ -1,17 +1,22 @@
-import './environment.js'
+import env from './environment.js'
+import Path from 'path'
 import express from 'express'
 import bodyParser from 'body-parser'
 import Router from 'express-promise-router'
-
 
 import Session from './Session.js'
 import { getView, takeAction } from './resources/index.js'
 
 const app = express()
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('client/build'))
-  // TODO handle glob serving of index.html
+export default app
+
+app.start = function(){
+  app.server = app.listen(env.PORT, () => {
+    const { port } = app.server.address()
+    const host = `http://localhost:${port}`
+    console.log(`Listening on port ${host}`)
+  })
 }
 
 // ROUTES
@@ -61,8 +66,9 @@ router.use((error, req, res, next) => {
   })
 })
 
-const server = app.listen(process.env.PORT, () => {
-  const { port } = server.address()
-  const host = `http://localhost:${port}`
-  console.log(`Listening on port ${host}`)
-})
+if (env.NODE_ENV === 'production') {
+  router.use(express.static('client/build'))
+  router.get('/*', function (req, res) {
+    res.sendFile(Path.join(env.BUILD_PATH, 'index.html'));
+  })
+}
