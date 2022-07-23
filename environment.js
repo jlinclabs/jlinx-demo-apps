@@ -7,6 +7,25 @@ const __dirname = Path.dirname(__filename)
 
 dotenv.config()
 
+for (const prop of [
+'NODE_ENV',
+'REACT_APP_NAME',
+'REACT_APP_COLOR',
+'PORT',
+'HOST',
+'URL',
+'JLINX_HOST',
+'JLINX_VAULT_KEY',
+'JLINX_VAULT_PATH',
+'SESSION_SECRET',
+'DATABASE_URL',
+]){
+  if (!process.env[prop]) {
+    console.error(`process.env.${prop} is missing!`)
+    process.exit(1)
+  }
+}
+
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
 const env = {
