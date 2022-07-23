@@ -1,0 +1,7 @@
+ npx prisma migrate deploy
+#!/usr/bin/env bash
+
+set -e
+set -x
+
+npx prisma migrate deploy
