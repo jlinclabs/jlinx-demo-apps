@@ -25,6 +25,7 @@ app.use(router)
 router.use(bodyParser.json())
 
 router.use(async (req, res, next) => {
+  console.log(`${req.method} ${req.protocol}://${req.get('host')}${req.url}`)
   req.session = await Session.open(req, res)
   next()
 })
