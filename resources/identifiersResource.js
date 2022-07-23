@@ -35,7 +35,7 @@ const identifiers = {
     async create({ currentUser, ...options }){
       console.log('identifiers.commands.create', options)
       const { publicKey, secretKey } = createSigningKeyPair()
-      const didDocument = signingKeyToDidDocument(publicKey)
+      const didDocument = Identifiers.signingKeyToDidDocument(publicKey)
       const did = didDocument.id
       const identifier = await identifiers.commands.create({
         did,
