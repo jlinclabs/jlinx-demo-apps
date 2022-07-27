@@ -1,26 +1,21 @@
 import * as React from 'react'
 import Box from '@mui/material/Box'
-import Avatar from '@mui/material/Avatar'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemAvatar from '@mui/material/ListItemAvatar'
-import ListItemText from '@mui/material/ListItemText'
+import CircularProgress from '@mui/material/CircularProgress'
 
-export default function IdentifierProfile({ identifier, sx, ...props }){
-  if (!identifier) identifier = '??????????????????????'
-  return <ListItemButton
-    dense
-    sx={{
-      // p: 0,
-      ...sx,
-    }}
-    {...props}
+import { useIdentifier } from '../resources/identifiers'
+import Link from './Link'
+import ErrorMessage from './ErrorMessage'
+import Profile from './Profile'
+
+export default function IdentifierProfile({ identifierId, sx, ...props }){
+  const [identifier, { loading, error }] = useIdentifier(identifierId)
+  if (loading) return <CircularProgress />
+  if (error) return <ErrorMessage error={error} />
+  return <Box
+    component={Link}
+    to={`/identifiers/${identifierId}`}
+    underline="none"
   >
-    <ListItemAvatar>
-      <Avatar>{identifier.slice(12)[0]}</Avatar>
-    </ListItemAvatar>
-    <ListItemText
-      primary={`${identifier}`}
-      secondary={`IDENTIFIER PROFILE PLACEHOLDER`}
-    />
-  </ListItemButton>
+    {identifier.profileId && <Profile id={identifier.profileId} />}
+  </Box>
 }

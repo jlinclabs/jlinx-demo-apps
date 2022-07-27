@@ -6,11 +6,12 @@ import Stack from '@mui/material/Stack'
 import Avatar from '@mui/material/Avatar'
 
 import { useProfile } from '../resources/profiles'
+import Link from '../components/Link'
 import ErrorMessage from '../components/ErrorMessage'
 
 export default function Profile({ id, ...props }){
   const [profile, { loading, error }] = useProfile(id)
-  if (!profile) return <CircularProgress/>
+  if (loading) return <CircularProgress/>
   if (error) return <ErrorMessage {...{ error }}/>
   return <Box {...props}>
     <Stack
@@ -25,6 +26,14 @@ export default function Profile({ id, ...props }){
       />
       <Typography variant="h4">{profile.state.name}</Typography>
     </Stack>
+
+
+    <Typography paragraph>
+      <Link
+        to={`${profile.header.host}/${profile.id}/stream`}
+        target="_blank"
+      >PUBLIC RECORD</Link>
+    </Typography>
   </Box>
 }
 

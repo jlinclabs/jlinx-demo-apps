@@ -68,9 +68,9 @@ function OfferContractForm(){
       >
         {identifiers.map(identifier =>
           <MenuItem
-            key={identifier.did}
-            value={identifier.did}
-          >{identifier.did}</MenuItem>
+            key={identifier.id}
+            value={identifier.id}
+          >{identifier.id}</MenuItem>
         )}
       </Select>
     </FormControl>

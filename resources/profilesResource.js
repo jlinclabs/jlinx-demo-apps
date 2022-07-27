@@ -40,6 +40,20 @@ const profiles = {
       })
       return profileToJSON({ profile, record })
     },
+
+    async update({ userId, profileId, changes }){
+
+      const record = await db.profile.findUnique({
+        where: { id: profileId },
+        select: { userId: true, createdAt: true }
+      })
+      if (record.userId !== userId){
+        throw new Error(`you are not authorized to change profile id=${profileId}`)
+      }
+      const profile = await jlinx.profiles.get(profileId)
+      await profile.set(changes)
+      return profileToJSON({ profile, record })
+    }
   },
 
   actions: {
@@ -49,6 +63,15 @@ const profiles = {
         profile,
       })
       console.log('profiles.create', profile)
+      return profile
+    },
+    async update({ currentUser, profileId, changes }){
+      const profile = await profiles.commands.update({
+        userId: currentUser.id,
+        profileId,
+        changes,
+      })
+      console.log('profiles.update', profile)
       return profile
     },
   },

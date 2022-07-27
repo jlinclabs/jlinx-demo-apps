@@ -101,8 +101,8 @@ function SignContractOfferingForm({ contractId }){
       <Link to={contract.contractUrl}>{contract.contractUrl}</Link><br/>
       {`is being offered to you by:`}<br/>
     </Typography>
-    <Paper elevation={1}>
-      <IdentifierProfile identifier={contract.offerer}/>
+    <Paper elevation={2} sx={{p: 2, m: 2}}>
+      <IdentifierProfile identifierId={contract.offerer}/>
     </Paper>
 
     <Typography paragraph>
@@ -138,9 +138,9 @@ function SignContractOfferingForm({ contractId }){
           >
             {identifiers.map(identifier =>
               <MenuItem
-                key={identifier.did}
-                value={identifier.did}
-              >{identifier.did}</MenuItem>
+                key={identifier.id}
+                value={identifier.id}
+              >{identifier.id}</MenuItem>
             )}
           </Select>
         </FormControl>

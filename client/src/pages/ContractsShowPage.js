@@ -46,8 +46,8 @@ function Contract({ id }){
     }
 
     <Typography paragraph>Offered by</Typography>
-    <Paper elevation={2}>
-      <IdentifierProfile identifier={contract.offerer}/>
+    <Paper elevation={2} sx={{p: 2, m: 2}}>
+      <IdentifierProfile identifierId={contract.offerer}/>
     </Paper>
 
 
@@ -82,7 +82,7 @@ function Contract({ id }){
     {contract.state === 'signed' && <>
       <Typography paragraph>Signed by</Typography>
       <Paper elevation={2}>
-        <IdentifierProfile identifier={contract.signer}/>
+        <IdentifierProfile identifierId={contract.signer}/>
       </Paper>
       <Typography paragraph>
         <Link

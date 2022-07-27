@@ -14,10 +14,17 @@ import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import Avatar from '@mui/material/Avatar'
 import Paper from '@mui/material/Paper'
+import CircularProgress from '@mui/material/CircularProgress'
 
 
+import useStateObject from '../lib/useStateObject'
 import { fileToImageDataURL, resizeImage } from '../lib/imageHelpers'
-import { useMyProfiles, useCreateProfile } from '../resources/profiles'
+import {
+  useProfile,
+  useMyProfiles,
+  useCreateProfile,
+  useUpdateProfile,
+} from '../resources/profiles'
 import Layout from '../Layout'
 import Link from '../components/Link'
 import ErrorMessage from '../components/ErrorMessage'
@@ -109,10 +116,11 @@ function Index(){
 
 function New(){
   const navigate = useNavigate()
-  const [ processingAvatar, setPrcessingAvatar ] = useState(false)
-  const [ avatarError, setAvatarError ] = useState(false)
-  const [ name, setName ] = useState('')
-  const [ avatar, setAvatar ] = useState('')
+
+  const [value, onChange] = useStateObject({
+    name: '',
+    avatar: null,
+  })
 
   const createProfile = useCreateProfile({
     onSuccess(profile){
@@ -124,86 +132,28 @@ function New(){
     },
   })
 
-  const onAvatarUpload = useCallback(
-    async event => {
-      console.log(event.target)
-      const file = event.target.files[0]
-      setPrcessingAvatar(true)
-      try{
-        let uri = await resizeImage({
-          dataUri: await fileToImageDataURL(file),
-          height: 240,
-          width: 240,
-          resizeTo: 'fill',
-        })
-        setAvatar(uri)
-      }catch(error){
-        setAvatarError(error)
-      }finally{
-        setPrcessingAvatar(false)
-      }
-    },
-    []
-  )
+  const onSubmit = () => {
+    createProfile({
+      profile: value,
+    })
+  }
 
-  const disabled = createProfile.pending
-  return <Paper {...{
-    elevation: 3,
-    component: 'form',
-    sx: { p: 2, m: 1 },
-    onSubmit(event){
-      event.preventDefault()
-      createProfile({
-        profile: {
-          name: name || undefined,
-          avatar: avatar || undefined,
-        },
-      })
-    }
-  }}>
+  return <Paper
+    sx={{m:2, p: 2}}
+  >
     <Typography component="h1" variant="h3">
       New Profile
     </Typography>
-    <Stack spacing={2} direction="row" alignItems="center" mt={2}>
-      <Avatar
-        alt={name}
-        src={avatar}
-        sx={{ width: 56, height: 56 }}
-      />
-      <div>
-        <ErrorMessage error={avatarError}/>
-        <Button
-          disabled={!!processingAvatar}
-          variant="contained"
-          component="label"
-        >
-          Upload
-          <input
-            disabled={!!processingAvatar}
-            hidden accept="image/*" multiple type="file"
-            onChange={onAvatarUpload}
-          />
-        </Button>
-      </div>
-    </Stack>
-    <Typography variant="body1" sx={{my: 2}}>
-      Which contract do you want to offer?
-    </Typography>
-
-    <TextField
-      label="Your name"
-      disabled={disabled}
-      margin="normal"
-      fullWidth
-      name="Name"
-      placeholder="Alice Jones"
-      value={name}
-      onChange={e => { setName(e.target.value) }}
-    />
-    {createProfile.error && <ErrorMessage error={createProfile.error} />}
-    <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-      <Button type="submit" variant="contained">{`Create`}</Button>
-    </Box>
+    <ProfileForm {...{
+      value,
+      onChange,
+      submitText: (
+        createProfile.pending ? 'Create' : 'Creating'
+      ),
+      onSubmit,
+      disabled: createProfile.pending,
+      error: createProfile.error,
+    }}/>
   </Paper>
 }
 
@@ -216,13 +166,157 @@ function Show(){
       sx={{ m: 3, p: 2 }}
     >
       <Profile id={id} />
+
+      <Stack
+        spacing={2}
+        direction="row-reverse"
+      >
+        <Button
+          variant="contained"
+          component={Link}
+          to={`/profiles/${id}/edit`}
+        >{`Edit Profile`}</Button>
+      </Stack>
     </Paper>
+
   </Container>
 }
 
 
 function Edit(){
-  return <Box>
-    Edit
+  const { id: profileId } = useParams()
+
+  const navigate = useNavigate()
+
+  const [value, onChange] = useStateObject()
+
+  const [profile, { loading, error }] = useProfile(profileId)
+
+  const updateProfile = useUpdateProfile({
+    onSuccess(profile){
+      console.log('CREATED', { profile })
+      navigate(`/profiles/${profile.id}`)
+    },
+    onFailure(error){
+      console.error(error)
+    },
+  })
+
+  const onSubmit = () => {
+    updateProfile({
+      profileId,
+      changes: value,
+    })
+  }
+
+  console.log({ profile, value })
+  return <Paper
+    sx={{m:2, p: 2}}
+  >
+    <Typography component="h1" variant="h3">
+      Edit Profile
+    </Typography>
+    <Typography component="h2" variant="h6">
+      ID: {profileId}
+    </Typography>
+    {loading
+      ? <CircularProgress/>
+      : <ProfileForm {...{
+        value: {
+          avatar: value.avatar || profile.state.avatar,
+          name: value.name || profile.state.name,
+        },
+        onChange,
+        submitText: (
+          updateProfile.pending ? 'Edit' : 'Editing'
+        ),
+        onSubmit,
+        disabled: updateProfile.pending,
+        error: error || updateProfile.error,
+      }}/>
+    }
+  </Paper>
+}
+
+
+
+function ProfileForm(props){
+
+  const [ processingAvatar, setPrcessingAvatar ] = useState(false)
+  const [ avatarError, setAvatarError ] = useState(false)
+  // const [ name, setName ] = useState('')
+  // const [ avatar, setAvatar ] = useState('')
+
+
+  const onAvatarUpload = useCallback(
+    async event => {
+      const file = event.target.files[0]
+      setPrcessingAvatar(true)
+      try{
+        const avatar = await resizeImage({
+          dataUri: await fileToImageDataURL(file),
+          height: 240,
+          width: 240,
+          resizeTo: 'fill',
+        })
+        props.onChange({ avatar })
+      }catch(error){
+        setAvatarError(error)
+      }finally{
+        setPrcessingAvatar(false)
+      }
+    },
+    []
+  )
+
+  console.log({ value: props.value })
+
+  // const disabled = createProfile.pending
+  return <Box {...{
+    disabled: props.disabled,
+    component: 'form',
+    onSubmit(event){
+      event.preventDefault()
+      props.onSubmit()
+    }
+  }}>
+
+    <Stack spacing={2} direction="row" alignItems="center" mt={2}>
+      <Avatar
+        alt={props.value.name}
+        src={props.value.avatar}
+        sx={{ width: 56, height: 56 }}
+      />
+      <div>
+        <ErrorMessage error={avatarError}/>
+        <Button
+          disabled={props.disabled || processingAvatar}
+          variant="contained"
+          component="label"
+        >
+          Upload
+          <input
+            disabled={props.disabled || processingAvatar}
+            hidden accept="image/*" multiple type="file"
+            onChange={onAvatarUpload}
+          />
+        </Button>
+      </div>
+    </Stack>
+
+    <TextField
+      label="Your name"
+      disabled={props.disabled}
+      margin="normal"
+      fullWidth
+      name="Name"
+      placeholder="Alice Jones"
+      value={props.value.name}
+      onChange={e => { props.onChange({name: e.target.value}) }}
+    />
+    {props.error && <ErrorMessage error={props.error} />}
+    <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+      <Button type="submit" variant="contained">{props.submitText}</Button>
+    </Box>
   </Box>
 }

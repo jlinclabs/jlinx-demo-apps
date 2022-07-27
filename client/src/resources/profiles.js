@@ -12,6 +12,18 @@ export function useCreateProfile(callbacks){
   })
 }
 
+export function useUpdateProfile(callbacks){
+  const reloadMyProfiles = useReloadMyProfiles()
+  return useAction('profiles.update', {
+    ...callbacks,
+    onSuccess(idenitifier){
+      reloadMyProfiles()
+      if (callbacks.onSuccess) callbacks.onSuccess(idenitifier)
+    },
+  })
+}
+
+
 export function useProfile(did){
   const { view: profile, ...state } = useView(`profiles.${did}`)
   return [profile, state]
