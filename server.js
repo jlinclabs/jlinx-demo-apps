@@ -22,7 +22,9 @@ app.start = function(){
 // ROUTES
 const router = Router()
 app.use(router)
-router.use(bodyParser.json())
+router.use(bodyParser.json({
+  limit: 102400 * 10,
+}))
 
 router.use(async (req, res, next) => {
   console.log(`${req.method} ${req.protocol}://${req.get('host')}${req.url}`)

@@ -9,6 +9,7 @@ import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Skeleton from '@mui/material/Skeleton'
+import PersonIcon from '@mui/icons-material/Person'
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined'
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined'
@@ -67,6 +68,11 @@ function SideNav({ loading, currentUser }) {
       )
     ) :
     currentUser ? <>
+      <NavButton {...{
+        icon: <PersonIcon/>,
+        text: 'Profiles',
+        to: '/profiles',
+      }}/>
       <NavButton {...{
         icon: <AccountBoxOutlinedIcon/>,
         text: 'Identifiers',

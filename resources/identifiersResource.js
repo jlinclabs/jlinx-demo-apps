@@ -1,48 +1,65 @@
 import db from '../prisma/client.js'
 import jlinx from '../jlinx.js'
-import { createSigningKeyPair } from 'jlinx-util'
-import Identifiers from 'jlinx-client/Identifiers.js'
+import profiles from './profilesResource.js'
 
 const identifiers = {
   queries: {
-    async byDid({ did }){
-      const identifier = await db.identifier.findUnique({
-        where: { did },
+    async byId({ id }){
+      const record = await db.identifier.findUnique({
+        where: { id },
+        select: { userId: true, createdAt: true }
       })
-      console.log({ identifier })
-      if (identifier){
-        identifier.signingKey = `${did}`.replace(/^did:key:/, '')
-        identifier.didDocument = Identifiers.signingKeyToDidDocument(identifier.signingKey)
-      }
-      console.log({ identifier })
-      return identifier
+      const identifier = await jlinx.identifiers.get(id)
+      return identifierToJSON({ identifier, record })
     },
 
     async forUser(userId){
-      return db.identifier.findMany({
+      const records = await db.identifier.findMany({
         where: { userId }
       })
+      return await Promise.all(
+        records.map(async record => {
+          const identifier = await jlinx.identifiers.get(record.id)
+          return identifierToJSON({ identifier, record })
+        })
+      )
     }
   },
 
   commands: {
-    async create(data){
-      return db.identifier.create({ data })
+    async create({ userId, profileId }){
+      console.log('identifiers.commands.create', { userId, profileId })
+
+      const profile = profileId
+        ? await profiles.queries.byId({ id: profileId })
+        : null
+        if (profile && profile.userId !== userId) profile = null
+
+      const identifier = await jlinx.identifiers.create()
+      if (profile) {
+        console.log('identifiers.commands.create', { profile })
+        await identifier.addService({
+          id: profile.id,
+          type: 'jlinx.profile',
+          serviceEndpoint: profile.serviceEndpoint,
+        })
+      }
+
+      const record = await db.identifier.create({
+        data: { id: identifier.id, userId },
+        select: { userId: true, createdAt: true },
+      })
+      return identifierToJSON({ identifier, record })
     },
   },
 
   actions: {
-    async create({ currentUser, ...options }){
-      console.log('identifiers.commands.create', options)
-      const { publicKey, secretKey } = createSigningKeyPair()
-      const didDocument = Identifiers.signingKeyToDidDocument(publicKey)
-      const did = didDocument.id
+    async create({ currentUser, profileId }){
       const identifier = await identifiers.commands.create({
-        did,
         userId: currentUser.id,
-        secretKey: secretKey.toString('hex'),
+        profileId
       })
-      console.log('identifiers.commands.create', identifier)
+      console.log('identifiers.create', identifier)
       return identifier
     },
   },
@@ -53,11 +70,23 @@ const identifiers = {
         ? await identifiers.queries.forUser(currentUser.id)
         : []
     },
-    ':did': async ({ did }) => {
-      return await identifiers.queries.byDid({ did })
+    ':id': async ({ id }) => {
+      return await identifiers.queries.byId({ id })
     }
   }
 }
 
-
 export default identifiers
+
+function identifierToJSON({ identifier, record }){
+  record = record || {}
+  const profileService = identifier.state.services
+    .find(service => service.type === 'jlinx.profile')
+  return {
+    ...identifier.toJSON(),
+    createdAt: record.createdAt,
+    userId: record.userId,
+    didDocument: identifier.asDidDocument(),
+    profileId: profileService ? profileService.id : undefined,
+  }
+}

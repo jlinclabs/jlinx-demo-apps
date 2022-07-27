@@ -32,8 +32,7 @@ model Session {
 }
 
 model Identifier {
-  did       String   @id
-  secretKey String
+  id        String   @id
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
   userId    Int

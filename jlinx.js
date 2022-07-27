@@ -1,6 +1,9 @@
 import Path from 'path'
 import b4a from 'b4a'
 import JlinxClient from 'jlinx-client'
+import JlinxIdentifiers from 'jlinx-client/Identifiers.js'
+import JlinxProfiles from 'jlinx-client/Profiles.js'
+import JlinxContracts from 'jlinx-client/Contracts.js'
 import exitHook from 'exit-hook'
 
 const {
@@ -14,6 +17,10 @@ const jlinx = new JlinxClient({
   vaultPath: JLINX_VAULT_PATH,
   vaultKey: b4a.from(JLINX_VAULT_KEY, 'hex')
 })
+
+jlinx.identifiers = new JlinxIdentifiers(jlinx)
+jlinx.profiles = new JlinxProfiles(jlinx)
+jlinx.contracts = new JlinxContracts(jlinx)
 
 console.log({jlinx})
 

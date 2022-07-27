@@ -4,33 +4,52 @@ import jlinx from '../jlinx.js'
 const profiles = {
   queries: {
     async byId({ id }){
-      return await db.profile.findUnique({
+      const record = await db.profile.findUnique({
         where: { id },
+        select: { userId: true, createdAt: true }
       })
+      const profile = await jlinx.profiles.get(id)
+      return profileToJSON({ profile, record })
     },
 
     async forUser(userId){
-      return db.profile.findMany({
+      const records = await db.profile.findMany({
         where: { userId }
       })
+      return await Promise.all(
+        records.map(async record => {
+          const profile = await jlinx.profiles.get(record.id)
+          return profileToJSON({ profile, record })
+        })
+      )
     }
   },
 
   commands: {
-    create(data){
-      return db.profile.create({ data })
+    async create({ userId, profile: value }){
+      const profile = await jlinx.profiles.create({
+        header: ({id}) => ({
+          serviceEndpoint: `${process.env.URL}/jlinx/profiles/${id}`
+        })
+      })
+      await profile.set(value)
+      console.log('profiles.create', profile, profile.value)
+      const record = await db.profile.create({
+        data: { id: profile.id, userId },
+        select: { userId: true, createdAt: true },
+      })
+      return profileToJSON({ profile, record })
     },
   },
 
   actions: {
-    create(){
-      const profile = await jlinx.profiles.create()
-      const record = await profiles.commands.create({
-        id: profile.id,
+    async create({ currentUser, profile }){
+      profile = await profiles.commands.create({
         userId: currentUser.id,
+        profile,
       })
-      console.log('identifiers.commands.create', identifier)
-      return identifier
+      console.log('profiles.create', profile)
+      return profile
     },
   },
 
@@ -46,5 +65,14 @@ const profiles = {
   }
 }
 
-
 export default profiles
+
+function profileToJSON({ profile, record }){
+  record = record || {}
+  return {
+    ...profile.toJSON(),
+    serviceEndpoint: profile.serviceEndpoint,
+    createdAt: record.createdAt,
+    userId: record.userId,
+  }
+}

@@ -1,6 +1,7 @@
 import pathToRegexp from 'path-to-regexp'
 import users from './usersResource.js'
 import session from './sessionResource.js'
+import profiles from './profilesResource.js'
 import identifiers from './identifiersResource.js'
 import contracts from './contractsResource.js'
 import { NotFoundError } from '../errors.js'
@@ -8,6 +9,7 @@ import { NotFoundError } from '../errors.js'
 const resources = {
   users,
   session,
+  profiles,
   identifiers,
   contracts,
 }
