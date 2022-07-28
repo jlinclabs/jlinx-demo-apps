@@ -27,7 +27,6 @@ export default function Profile({ id, ...props }){
       <Typography variant="h4">{profile.state.name}</Typography>
     </Stack>
 
-
     <Typography paragraph>
       <Link
         to={`${profile.header.host}/${profile.id}/stream`}
