@@ -29,15 +29,17 @@ const identifiers = {
   commands: {
     async create({ userId, profileId }){
       console.log('identifiers.commands.create', { userId, profileId })
-
-      const profile = profileId
+      const profileRecord = profileId
         ? await profiles.queries.byId({ id: profileId })
         : null
-        if (profile && profile.userId !== userId) profile = null
 
+      if (profileRecord && profileRecord.userId !== userId){
+        throw new Error(`invalid profileId`)
+      }
+
+      const profile = await jlinx.profiles.get(profileId)
       const identifier = await jlinx.identifiers.create()
       if (profile) {
-        console.log('identifiers.commands.create', { profile })
         await identifier.addService({
           id: profile.id,
           type: 'jlinx.profile',
