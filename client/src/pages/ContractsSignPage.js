@@ -17,6 +17,7 @@ import { useMyIdentifiers } from '../resources/identifiers'
 import Layout from '../Layout'
 import Link from '../components/Link'
 import IdentifierProfile from '../components/IdentifierProfile'
+import IdentifierSelectInput from '../components/IdentifierSelectInput'
 
 export default function ContractsSignPage() {
   const [search, setSearch] = useSearchParams()
@@ -114,7 +115,7 @@ function SignContractOfferingForm({ contractId }){
 
     {signatureId
       ? <>
-        <Typography variant="h2" sx={{mt: 2}}>Signed!</Typography>
+        <Typography variant="h4" sx={{mt: 2}}>Signed</Typography>
         <Typography paragraph>
           <Link
             to={`${contract.jlinxHost}/${signatureId}/stream`}
@@ -126,24 +127,11 @@ function SignContractOfferingForm({ contractId }){
         <Typography variant="body1" sx={{my: 2}}>
           Which identifier do you want to sign this contract as?
         </Typography>
-        <FormControl fullWidth sx={{mb:3}}>
-          <InputLabel id="identifierDidLabel">Identifier</InputLabel>
-          <Select
-            name="identifierDid"
-            labelId="identifierDidLabel"
-            disabled={disabled}
-            autoFocus
-            value={identifierDid}
-            onChange={e => { setIdentifierDid(e.target.value) }}
-          >
-            {identifiers.map(identifier =>
-              <MenuItem
-                key={identifier.id}
-                value={identifier.id}
-              >{identifier.id}</MenuItem>
-            )}
-          </Select>
-        </FormControl>
+        <IdentifierSelectInput {...{
+          autoFocus: true,
+          value: identifierDid,
+          onChange: e => { setIdentifierDid(e.target.value) },
+        }}/>
         <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
           <Button type="submit" variant="contained">{`Sign Contract`}</Button>
         </Box>
