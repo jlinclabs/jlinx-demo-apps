@@ -16,7 +16,7 @@ export default function HomePage() {
         <Typography variant="h3">
           {currentUser
             ? `Welcome back ${currentUser.email}`
-            : `Welcome to ${process.env.APP_NAME}`
+            : `Welcome to ${process.env.REACT_APP_NAME}`
           }
         </Typography>
         {currentUser ? null : <>
