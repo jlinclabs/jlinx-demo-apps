@@ -160,23 +160,27 @@ function New(){
 
 function Show(){
   const { id } = useParams()
+  const [profile, { loading, error }] = useProfile(id)
+  const editable = profile && profile.meta.writable
   return <Container maxWidth="sm">
     <Paper
       elevation={3}
       sx={{ m: 3, p: 2 }}
     >
       <Profile id={id} />
-
-      <Stack
-        spacing={2}
-        direction="row-reverse"
-      >
-        <Button
-          variant="contained"
-          component={Link}
-          to={`/profiles/${id}/edit`}
-        >{`Edit Profile`}</Button>
-      </Stack>
+      {editable
+        ? <Stack
+          spacing={2}
+          direction="row-reverse"
+        >
+          <Button
+            variant="contained"
+            component={Link}
+            to={`/profiles/${id}/edit`}
+          >{`Edit Profile`}</Button>
+        </Stack>
+        : null
+      }
     </Paper>
 
   </Container>
