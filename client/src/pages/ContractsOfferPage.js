@@ -11,7 +11,9 @@ import TextField from '@mui/material/TextField'
 import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
+import Avatar from '@mui/material/Avatar'
 
+import { useMyProfiles } from '../resources/profiles'
 import { useMyIdentifiers } from '../resources/identifiers'
 import { useOfferContract } from '../resources/contracts'
 import Layout from '../Layout'
@@ -27,10 +29,10 @@ export default function OfferContractPage({ router }) {
 
 function OfferContractForm(){
   const navigate = useNavigate()
-  const [identifiers = []] = useMyIdentifiers()
-
-  const [ contractUrl, setContractUrl ] = useState('https://contracts.io/sisa-suyF9tPmVrtuuLn3R4XdzGXMZN6aFfCIXuXwGpAHtCw.md')
-  const [ identifierDid, setIdentifierDid ] = useState('')
+  const [identifiers] = useMyIdentifiers()
+  const [profiles] = useMyProfiles()
+  const [contractUrl, setContractUrl] = useState('https://contracts.io/sisa-suyF9tPmVrtuuLn3R4XdzGXMZN6aFfCIXuXwGpAHtCw.md')
+  const [identifierDid, setIdentifierDid] = useState('')
   const offerContract = useOfferContract({
     onSuccess(contract){
       navigate(`/contracts/${contract.id}`)
@@ -56,24 +58,13 @@ function OfferContractForm(){
     <Typography variant="body1" sx={{my: 2}}>
       Which identifier do you want to offer this contract as?
     </Typography>
-    <FormControl fullWidth>
-      <InputLabel id="identifierDidLabel">Identifier</InputLabel>
-      <Select
-        name="identifierDid"
-        labelId="identifierDidLabel"
-        disabled={disabled}
-        autoFocus
-        value={identifierDid}
-        onChange={e => { setIdentifierDid(e.target.value) }}
-      >
-        {identifiers.map(identifier =>
-          <MenuItem
-            key={identifier.id}
-            value={identifier.id}
-          >{identifier.id}</MenuItem>
-        )}
-      </Select>
-    </FormControl>
+    <IdentitySelectInput {...{
+      autoFocus: true,
+      value: identifierDid,
+      onChange: e => { setIdentifierDid(e.target.value) },
+      identifiers,
+      profiles,
+    }}/>
     <Typography variant="body1" sx={{my: 2}}>
       Which contract do you want to offer?
     </Typography>
@@ -94,4 +85,42 @@ function OfferContractForm(){
       <Button type="submit" variant="contained">{`Create`}</Button>
     </Box>
   </Paper>
+}
+
+function IdentitySelectInput({
+  identifiers, profiles,
+  value, onChange, disabled, loading = false, ...props
+}){
+  if (!identifiers || !profiles) loading = true
+  return <FormControl fullWidth>
+    <InputLabel id="IdentitySelectInputLabel">Identifier</InputLabel>
+    <Select {...{
+      name: 'identity',
+      ...props,
+      labelId: 'IdentitySelectInputLabel',
+      disabled: !!(disabled || loading),
+      value,
+      onChange,
+    }}>
+      {loading ? null : identifiers.map(identifier => {
+        const profile = profiles
+          .find(profile => profile.id === identifier.profileId)
+          || { }
+        console.log({ identifier, profile })
+        return <MenuItem key={identifier.id} value={identifier.id}>
+          <Stack spacing={2} direction="row" alignItems="center">
+            <Avatar
+              alt={profile.name}
+              src={profile.avatar}
+              sx={{ width: 56, height: 56 }}
+            />
+            <Stack spacing={0} direction="column">
+              <Typography component="span" variant="body1">{profile.name}</Typography>
+              <Typography component="span" variant="body2">{identifier.id}</Typography>
+            </Stack>
+          </Stack>
+        </MenuItem>
+      })}
+    </Select>
+  </FormControl>
 }

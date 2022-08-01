@@ -92,9 +92,14 @@ export default profiles
 
 function profileToJSON({ profile, record }){
   record = record || {}
+  const { id, state, ...meta } = profile.toJSON()
   return {
-    ...profile.toJSON(),
-    serviceEndpoint: profile.serviceEndpoint,
+    ...state,
+    id,
+    meta: {
+      ...meta,
+      serviceEndpoint: profile.serviceEndpoint,
+    },
     createdAt: record.createdAt,
     userId: record.userId,
   }

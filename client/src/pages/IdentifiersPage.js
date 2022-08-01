@@ -8,6 +8,7 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemText from '@mui/material/ListItemText'
+import ListItemAvatar from '@mui/material/ListItemAvatar'
 import Skeleton from '@mui/material/Skeleton'
 import Box from '@mui/material/Box'
 import FormControl from '@mui/material/FormControl'
@@ -107,7 +108,7 @@ function New() {
         value={profileId}
         onChange={e => { setProfileId(e.target.value) }}
       >
-        <MenuItem key="none" value={null}>
+        <MenuItem key="none" value="">
           <Typography component="span" variant="body2">
             <Stack spacing={2} direction="row" alignItems="center">
               <Avatar sx={{ width: 56, height: 56 }} />
@@ -122,11 +123,11 @@ function New() {
           >
             <Stack spacing={2} direction="row" alignItems="center">
               <Avatar
-                alt={profile.state.name}
-                src={profile.state.avatar}
+                alt={profile.name}
+                src={profile.avatar}
                 sx={{ width: 56, height: 56 }}
               />
-              <Typography component="span" variant="body1">{profile.state.name}</Typography>
+              <Typography component="span" variant="body1">{profile.name}</Typography>
             </Stack>
           </MenuItem>
         )}
@@ -178,7 +179,12 @@ function Identifier({ id, ...props }){
 }
 
 function MyIdentifiersList(){
-  const [myIdentifiers,  {loading, error}] = useMyIdentifiers()
+  const [myIdentifiers, myIdentifiersRequest] = useMyIdentifiers()
+  const [myProfiles, myProfilesRequest] = useMyProfiles()
+
+  const loading = myIdentifiersRequest.loading || myProfilesRequest.loading
+  const error = myIdentifiersRequest.error || myProfilesRequest.error
+
   if (error){
     return <ErrorMessage {...{error}}/>
   }
@@ -196,12 +202,16 @@ function MyIdentifiersList(){
     width: '100%',
   }}>
     {myIdentifiers.map(identifier =>
-      <MyIdentifier key={identifier.did} identifier={identifier}/>
+      <MyIdentifier {...{
+        key: identifier.id,
+        identifier,
+        profile: myProfiles.find(p => p.id === identifier.profileId)
+      }}/>
     )}
   </List>
 }
 
-function MyIdentifier({ identifier }){
+function MyIdentifier({ identifier, profile = {} }){
   return <ListItem {...{
     secondaryAction: (
       undefined
@@ -215,8 +225,13 @@ function MyIdentifier({ identifier }){
       dense: true,
       component: Link,
       to: `/identifiers/${identifier.id}`,
-      // to: Link.to.myIdentifier({ did: identifier.did })
     }}>
+      <ListItemAvatar>
+        <Avatar
+          alt={profile.name}
+          src={profile.avatar}
+        />
+      </ListItemAvatar>
       <ListItemText {...{
         primaryTypographyProps: {
           sx: {

@@ -20,16 +20,16 @@ export default function Profile({ id, ...props }){
       alignItems="center"
     >
       <Avatar
-        alt={profile.state.name}
-        src={profile.state.avatar}
+        alt={profile.name}
+        src={profile.avatar}
         sx={{ width: 56, height: 56 }}
       />
-      <Typography variant="h4">{profile.state.name}</Typography>
+      <Typography variant="h4">{profile.name}</Typography>
     </Stack>
 
     <Typography paragraph>
       <Link
-        to={`${profile.header.host}/${profile.id}/stream`}
+        to={`${profile.meta.header.host}/${profile.id}/stream`}
         target="_blank"
       >PUBLIC RECORD</Link>
     </Typography>

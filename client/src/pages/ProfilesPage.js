@@ -89,8 +89,8 @@ function Index(){
             }}>
               <ListItemAvatar>
                 <Avatar
-                  alt={profile.state.name}
-                  src={profile.state.avatar}
+                  alt={profile.name}
+                  src={profile.avatar}
                 />
               </ListItemAvatar>
               <ListItemText {...{
@@ -100,7 +100,7 @@ function Index(){
                     whiteSpace: 'nowrap',
                   },
                 },
-                primary: `${profile.state.name}`,
+                primary: `${profile.name}`,
                 secondary: <span>
                   created <Timestamp at={profile.createdAt}/>
                 </span>
@@ -223,12 +223,12 @@ function Edit(){
       ? <CircularProgress/>
       : <ProfileForm {...{
         value: {
-          avatar: value.avatar || profile.state.avatar,
-          name: value.name || profile.state.name,
+          avatar: value.avatar || profile.avatar,
+          name: value.name || profile.name,
         },
         onChange,
         submitText: (
-          updateProfile.pending ? 'Edit' : 'Editing'
+          updateProfile.pending ? 'Saving…' : 'Save'
         ),
         onSubmit,
         disabled: updateProfile.pending,
