@@ -4,6 +4,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import Router from 'express-promise-router'
 
+import uploads from './uploads.js'
 import Session from './Session.js'
 import { getView, takeAction } from './resources/index.js'
 
@@ -18,6 +19,8 @@ app.start = function(){
     console.log(`Listening on port ${host}`)
   })
 }
+
+app.use(uploads)
 
 // ROUTES
 const router = Router()

@@ -18,7 +18,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 
 
 import useStateObject from '../lib/useStateObject'
-import { fileToImageDataURL, resizeImage } from '../lib/imageHelpers'
+import { useUploadFile } from '../lib/uploads'
 import {
   useProfile,
   useMyProfiles,
@@ -245,37 +245,23 @@ function Edit(){
 
 
 function ProfileForm(props){
-
-  const [ processingAvatar, setPrcessingAvatar ] = useState(false)
-  const [ avatarError, setAvatarError ] = useState(false)
-  // const [ name, setName ] = useState('')
-  // const [ avatar, setAvatar ] = useState('')
-
-
-  const onAvatarUpload = useCallback(
-    async event => {
-      const file = event.target.files[0]
-      setPrcessingAvatar(true)
-      try{
-        const avatar = await resizeImage({
-          dataUri: await fileToImageDataURL(file),
-          height: 240,
-          width: 240,
-          resizeTo: 'fill',
-        })
-        props.onChange({ avatar })
-      }catch(error){
-        setAvatarError(error)
-      }finally{
-        setPrcessingAvatar(false)
-      }
+  const uploadAvatar = useUploadFile({
+    onSuccess(url){
+      props.onChange({ avatar: url })
     },
-    []
+  })
+
+  const onAvatarFileSelect = useCallback(
+    event => {
+      const file = event.target.files[0]
+      event.target.value = null
+      uploadAvatar.call(file)
+    },
+    [uploadAvatar]
   )
 
-  console.log({ value: props.value })
+  console.log(JSON.stringify({ value: props.value }))
 
-  // const disabled = createProfile.pending
   return <Box {...{
     disabled: props.disabled,
     component: 'form',
@@ -292,17 +278,17 @@ function ProfileForm(props){
         sx={{ width: 56, height: 56 }}
       />
       <div>
-        <ErrorMessage error={avatarError}/>
+        <ErrorMessage error={uploadAvatar.error}/>
         <Button
-          disabled={props.disabled || processingAvatar}
+          disabled={props.disabled || uploadAvatar.pending}
           variant="contained"
           component="label"
         >
           Upload
           <input
-            disabled={props.disabled || processingAvatar}
+            disabled={props.disabled || uploadAvatar.pending}
             hidden accept="image/*" multiple type="file"
-            onChange={onAvatarUpload}
+            onChange={onAvatarFileSelect}
           />
         </Button>
       </div>
