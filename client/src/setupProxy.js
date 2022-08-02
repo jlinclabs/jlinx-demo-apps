@@ -10,7 +10,7 @@ module.exports = function(app) {
     '/api',
     createProxyMiddleware({
       target: process.env.API_SERVER,
-      changeOrigin: true,
+      changeOrigin: false,
     })
   )
 }
