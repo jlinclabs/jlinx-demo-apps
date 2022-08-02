@@ -262,8 +262,9 @@ function ProfileForm(props){
 
   console.log(JSON.stringify({ value: props.value }))
 
+  const disabled = props.disabled || uploadAvatar.pending
   return <Box {...{
-    disabled: props.disabled,
+    disabled,
     component: 'form',
     onSubmit(event){
       event.preventDefault()
@@ -272,21 +273,32 @@ function ProfileForm(props){
   }}>
 
     <Stack spacing={2} direction="row" alignItems="center" mt={2}>
-      <Avatar
-        alt={props.value.name}
-        src={props.value.avatar}
-        sx={{ width: 56, height: 56 }}
-      />
+      <Box sx={{ width: 56, height: 56 }}>
+        {uploadAvatar.pending
+          ? <CircularProgress
+            sx={{ m: 1, width: 56, height: 56 }}
+          />
+          : <Avatar
+            alt={props.value.name}
+            src={props.value.avatar}
+            sx={{ width: 56, height: 56 }}
+          />
+        }
+      </Box>
       <div>
         <ErrorMessage error={uploadAvatar.error}/>
         <Button
-          disabled={props.disabled || uploadAvatar.pending}
+          disabled={disabled}
           variant="contained"
           component="label"
         >
-          Upload
+          {
+            uploadAvatar.error ? 'failed' :
+            uploadAvatar.pending ? 'Uploading…' :
+            'Upload'
+          }
           <input
-            disabled={props.disabled || uploadAvatar.pending}
+            disabled={disabled}
             hidden accept="image/*" multiple type="file"
             onChange={onAvatarFileSelect}
           />
@@ -306,7 +318,11 @@ function ProfileForm(props){
     />
     {props.error && <ErrorMessage error={props.error} />}
     <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-      <Button type="submit" variant="contained">{props.submitText}</Button>
+      <Button
+        type="submit"
+        variant="contained"
+        disabled={disabled}
+      >{props.submitText}</Button>
     </Box>
   </Box>
 }
