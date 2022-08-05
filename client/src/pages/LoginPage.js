@@ -74,7 +74,7 @@ function LoginForm({ reloadCurrentUser }){
     <Stack spacing={2} direction="row-reverse" mt={2}>
       <Button type="submit" variant="contained" >Submit</Button>
       <Button variant="text" component={Link} to="/signup">signup</Button>
-      <Button variant="text" component={Link} to="/reset-password" color="secondary">reset password</Button>
+      {/* <Button variant="text" component={Link} to="/reset-password" color="secondary">reset password</Button> */}
     </Stack>
   </Paper>
 }
