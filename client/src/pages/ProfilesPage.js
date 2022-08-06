@@ -161,12 +161,13 @@ function New(){
 function Show(){
   const { id } = useParams()
   const [profile, { loading, error }] = useProfile(id)
-  const editable = profile && profile.meta.writable
+  const editable = profile && profile.writable
   return <Container maxWidth="sm">
     <Paper
       elevation={3}
       sx={{ m: 3, p: 2 }}
     >
+      <Typography variant="h4" mb={2}>Profile</Typography>
       <Profile id={id} />
       {editable
         ? <Stack

@@ -7,6 +7,7 @@ import Avatar from '@mui/material/Avatar'
 
 import { useProfile } from '../resources/profiles'
 import Link from '../components/Link'
+import LinkToJlinxHost from '../components/LinkToJlinxHost'
 import ErrorMessage from '../components/ErrorMessage'
 
 export default function Profile({ id, ...props }){
@@ -19,20 +20,21 @@ export default function Profile({ id, ...props }){
       direction="row"
       alignItems="center"
     >
-      <Avatar
-        alt={profile.name}
-        src={profile.avatar}
-        sx={{ width: 56, height: 56 }}
+      <Link to={`/profiles/${id}`}>
+        <Avatar
+          alt={profile.name}
+          src={profile.avatar}
+          sx={{ width: 56, height: 56 }}
+        />
+      </Link>
+      <Link to={`/profiles/${id}`}>
+        <Typography variant="h4">{profile.name}</Typography>
+      </Link>
+      <LinkToJlinxHost
+        host={profile.meta.header.host}
+        id={profile.id}
       />
-      <Typography variant="h4">{profile.name}</Typography>
     </Stack>
-
-    <Typography paragraph>
-      <Link
-        to={`${profile.meta.header.host}/${profile.id}/stream`}
-        target="_blank"
-      >PUBLIC RECORD</Link>
-    </Typography>
   </Box>
 }
 

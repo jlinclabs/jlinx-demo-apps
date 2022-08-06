@@ -30,17 +30,19 @@ import Layout from '../Layout'
 import Link from '../components/Link'
 import ErrorMessage from '../components/ErrorMessage'
 import Timestamp from '../components/Timestamp'
+import LinkToJlinxHost from '../components/LinkToJlinxHost'
 import Profile from '../components/Profile'
 
 import InspectObject from '../components/InspectObject'
 
 export default function IdenitifiersPage() {
   return <Layout title="Identifiers" requireLoggedIn>
-    <Container maxwidth="lg">
+    <Container p={4}>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/new" element={<New />} />
         <Route path="/:id" element={<Show />} />
+        <Route path="/:id/did-document" element={<ShowDidDocument />} />
         <Route path="/:id/edit" element={<Edit />} />
       </Routes>
     </Container>
@@ -153,6 +155,18 @@ function Show() {
   </Container>
 }
 
+function ShowDidDocument() {
+  const { id } = useParams()
+  return <Container>
+    <Paper
+      elevation={3}
+      sx={{ m: 3, p: 2 }}
+    >
+      <IdentifierDidDocument id={id} />
+    </Paper>
+  </Container>
+}
+
 function Edit() {
   return <Container>
     Edit
@@ -164,17 +178,71 @@ function Identifier({ id, ...props }){
   const [identifier, { loading, error }] = useIdentifier(id)
   if (!identifier) return <CircularProgress/>
   if (error) return <ErrorMessage {...{ error }}/>
+  const did = identifier.didDocument.id
+  const editable = identifier.writable
+
   return <Box {...props}>
-    <Typography variant="h5" mb={2}>Identifer: {identifier.id}</Typography>
-    {identifier.profileId
-      ? <Box>
-        <Link to={`/profiles/${identifier.profileId}`}>
-          <Profile id={identifier.profileId} />
-        </Link>
-      </Box>
+    <Stack flexDirection="row" justifyContent="space-between">
+      <Typography
+        variant="h5"
+        sx={{
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipses',
+        }}
+      >
+        {`Identifier`}
+      </Typography>
+      <LinkToJlinxHost
+        host={identifier.header.host}
+        id={identifier.id}
+      />
+    </Stack>
+    <Box>
+      <Typography variant="h7">
+        <Link to={`/identifiers/${id}/did-document`}>{`DID: ${did}`}</Link>
+      </Typography>
+    </Box>
+    <Box my={2}>
+      <Typography variant="h7">
+        {'Created: '}
+        <Timestamp at={identifier.createdAt}/>
+      </Typography>
+    </Box>
+
+    <Box mt={2}>
+      <Typography variant="h6">Profile:</Typography>
+      {identifier.profileId
+        ? <Profile id={identifier.profileId} />
+        : null
+      }
+    </Box>
+
+    {editable
+      ? <Stack
+        spacing={2}
+        direction="row-reverse"
+      >
+        <Button
+          variant="contained"
+          component={Link}
+          to={`/identifiers/${id}/edit`}
+        >{`Edit Identifier`}</Button>
+      </Stack>
       : null
     }
-    {/* <InspectObject object={identifier}/> */}
+
+  </Box>
+}
+
+function IdentifierDidDocument({ id, ...props }){
+  const [identifier, { loading, error }] = useIdentifier(id)
+  if (!identifier) return <CircularProgress/>
+  if (error) return <ErrorMessage {...{ error }}/>
+  return <Box {...props}>
+    <Typography variant="h4">DID Document</Typography>
+    <InspectObject object={identifier.didDocument}/>
+    {/* <InspectObject object={identifier.didDocument}/> */}
   </Box>
 }
 
