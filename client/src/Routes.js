@@ -4,15 +4,9 @@ import HomePage from './pages/HomePage'
 import SignupPage from './pages/SignupPage'
 import LoginPage from './pages/LoginPage'
 import LogoutPage from './pages/LogoutPage'
-
 import ProfilesPage from './pages/ProfilesPage'
-
 import IdentifiersPage from './pages/IdentifiersPage'
-
-import ContractsIndexPage from './pages/ContractsIndexPage'
-import ContractsShowPage from './pages/ContractsShowPage'
-import ContractsOfferPage from './pages/ContractsOfferPage'
-import ContractsSignPage from './pages/ContractsSignPage'
+import ContractsIndexPage from './pages/ContractsPage'
 
 export default function Routes() {
   return <_Routes>
@@ -20,14 +14,8 @@ export default function Routes() {
     <Route path="/signup" element={<SignupPage />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/logout" element={<LogoutPage />} />
-
     <Route path="/profiles/*" element={<ProfilesPage />} />
-
     <Route path="/identifiers/*" element={<IdentifiersPage />} />
-
-    <Route path="/contracts" element={<ContractsIndexPage />} />
-    <Route path="/contracts/:id" element={<ContractsShowPage />} />
-    <Route path="/contracts/offer" element={<ContractsOfferPage />} />
-    <Route path="/contracts/sign" element={<ContractsSignPage />} />
+    <Route path="/contracts/*" element={<ContractsIndexPage />} />
   </_Routes>
 }

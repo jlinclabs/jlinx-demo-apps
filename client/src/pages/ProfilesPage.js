@@ -30,6 +30,7 @@ import Link from '../components/Link'
 import ErrorMessage from '../components/ErrorMessage'
 import Timestamp from '../components/Timestamp'
 import Profile from '../components/Profile'
+import InspectObject from '../components/InspectObject'
 
 export default function ProfilesPage() {
   return <Layout title="Profiles" requireLoggedIn>
@@ -161,7 +162,7 @@ function New(){
 function Show(){
   const { id } = useParams()
   const [profile, { loading, error }] = useProfile(id)
-  const editable = profile && profile.writable
+  const editable = profile && profile.meta.writable
   return <Container maxWidth="sm">
     <Paper
       elevation={3}
@@ -184,6 +185,16 @@ function Show(){
       }
     </Paper>
 
+    <Paper
+      elevation={3}
+      sx={{ m: 3, p: 2 }}
+    >
+      <Typography variant="h6" mb={2}>JLINX Ledger Events</Typography>
+      {profile.meta.events.map((event, index) =>
+        <InspectObject key={index} object={event}/>
+      )}
+    </Paper>
+    {/* <InspectObject object={profile.meta.events}/> */}
   </Container>
 }
 
