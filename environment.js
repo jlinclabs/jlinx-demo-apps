@@ -11,7 +11,7 @@ if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
 console.log(`NODE_ENV=${process.env.NODE_ENV} APP_DIR=${APP_DIR}`)
 
-const tld = process.env.NODE_ENV = 'production' ? 'jlinc.io' : jlinx.test
+const tld = process.env.NODE_ENV === 'production' ? 'jlinc.io' : 'jlinx.test'
 
 const allSites = [
   {
