@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt'
 import prisma from '../prisma/client.js'
 import { JlinxClient } from '../jlinx.js'
+import users from './usersResource.js'
 
 const sessionResource = {
 
@@ -16,8 +17,9 @@ const sessionResource = {
           user: {
             select: {
               id: true,
-              email: true,
-              name: true,
+              // did: true,
+              // email: true,
+              // name: true,
               createdAt: true,
             }
           },
@@ -52,19 +54,17 @@ const sessionResource = {
 
   actions: {
 
-    async signup({ session, email, password }){
-      console.log('signup', { session, email, password })
+    async signup({ session, secretKey }){
+      console.log('signup', { session, secretKey })
       if (session.userId){
         throw new Error(`please logout first`)
       }
-      const passwordSalt = await bcrypt.genSalt(10)
-      const passwordHash = await bcrypt.hash(password, passwordSalt)
-      const user = await prisma.user.create({
-        data: {
-          email,
-          passwordHash,
-          passwordSalt,
-        }
+      const secretKeySalt = await bcrypt.genSalt(10)
+      const secretKeyHash = await bcrypt.hash(secretKey, secretKeySalt)
+      // const user = await prisma.user.create({
+      const user = await users.commands.create({
+        secretKeyHash,
+        secretKeySalt,
       })
       await session.setUserId(user.id)
       // await session.save();

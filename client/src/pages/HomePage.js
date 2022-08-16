@@ -7,30 +7,21 @@ import Button from '@mui/material/Button'
 import { useCurrentUser } from '../resources/session'
 import Layout from '../Layout'
 import Link from '../components/Link'
+import LoginForm from '../components/LoginForm'
+import SignupForm from '../components/SignupForm'
 
 export default function HomePage() {
   const { currentUser } = useCurrentUser()
   return <Layout>
     <Container maxWidth="md">
-      <Paper elevation={3} sx={{m: 2, p: 2}}>
-        <Typography variant="h3">
-          {currentUser
-            ? `Welcome back ${currentUser.email}`
-            : `Welcome to ${process.env.REACT_APP_NAME}`
-          }
-        </Typography>
-        {currentUser ? null : <>
-          <Stack spacing={2} mt={3}>
-            <Button variant="contained" component={Link} to="/login">Login</Button>
-            <Button variant="contained" component={Link} to="/signup">Signup</Button>
-          </Stack>
-        </>}
-        <BreakThings/>
-      </Paper>
+      {currentUser
+        ? <></>
+        : <Stack>
+          <SignupForm elevation={3} sx={{m: 2, p: 2}}/>
+          <LoginForm elevation={3} sx={{m: 2, p: 2}}/>
+        </Stack>
+      }
+
     </Container>
   </Layout>
-}
-
-function BreakThings(){
-  // throw new Error('boom')
 }

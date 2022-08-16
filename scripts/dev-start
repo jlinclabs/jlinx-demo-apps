@@ -8,5 +8,5 @@ exec concurrently \
   --kill-others \
   --names "SERVER,CLIENT" \
   "PORT=${SERVER_PORT} nodemon --exec ./scripts/start.cjs" \
-  "cd client && BROWSER=none DANGEROUSLY_DISABLE_HOST_CHECK=true API_SERVER=\"${API_SERVER}\" npm run start"
+  "cd client && HTTPS=true BROWSER=none DANGEROUSLY_DISABLE_HOST_CHECK=true API_SERVER=\"${API_SERVER}\" npm run start"
 

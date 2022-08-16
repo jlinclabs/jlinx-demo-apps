@@ -1,5 +1,4 @@
 import { useState } from 'react'
-
 import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
@@ -8,41 +7,28 @@ import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 
 import Layout from '../Layout'
-import Link from '../components/Link'
-import ErrorMessage from '../components/ErrorMessage'
-import { useCurrentUser, useSignup } from '../resources/session'
+import Link from './Link'
+import ErrorMessage from './ErrorMessage'
+import { useCurrentUser, useLogin } from '../resources/session'
 
-export default function Signup() {
-  useCurrentUser({
-    redirectToIfFound: '/',
-  })
-
-  return <Layout title="Signup">
-    <Container maxWidth="sm">
-      <SignupForm />
-    </Container>
-  </Layout>
-}
-
-function SignupForm(){
+export default function LoginForm({ reloadCurrentUser }){
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [passwordConfirmation, setPasswordConfirmation] = useState('')
 
-  const signup = useSignup()
+  const login = useLogin()
 
   const onSubmit = event => {
     event.preventDefault()
-    signup({ email, password })
+    login({ email, password })
   }
-  const disabled = !!signup.pending
+  const disabled = !!login.pending
   return <Paper {...{
     component: 'form',
     onSubmit,
     sx: { m: 2, p: 2 }
   }}>
-    <Typography variant="h4">Signup</Typography>
-    <ErrorMessage error={signup.error}/>
+    <Typography variant="h4">Login</Typography>
+    <ErrorMessage error={login.error}/>
     <TextField
       autoFocus
       label="Email"
@@ -69,22 +55,10 @@ function SignupForm(){
       value={password}
       onChange={e => { setPassword(e.target.value) }}
     />
-    <TextField
-      label="Password Confirmation"
-      autoComplete="new-password"
-      disabled={disabled}
-      margin="normal"
-      required
-      fullWidth
-      name="password"
-      type="password"
-      value={passwordConfirmation}
-      onChange={e => { setPasswordConfirmation(e.target.value) }}
-      error={!!(passwordConfirmation && passwordConfirmation !== password)}
-    />
     <Stack spacing={2} direction="row-reverse" mt={2}>
       <Button type="submit" variant="contained" >Submit</Button>
-      <Button variant="text" component={Link} to="/login">login</Button>
+      <Button variant="text" component={Link} to="/signup">signup</Button>
+      {/* <Button variant="text" component={Link} to="/reset-password" color="secondary">reset password</Button> */}
     </Stack>
   </Paper>
 }

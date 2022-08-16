@@ -6,7 +6,15 @@ const users = {
   },
 
   commands: {
-
+    async create({ secretKeyHash, secretKeySalt }){
+      const record = await prisma.user.create({
+        data: {
+          secretKeyHash,
+          secretKeySalt,
+        }
+      })
+      return record
+    }
   },
 
   actions: {
