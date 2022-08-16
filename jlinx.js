@@ -1,13 +1,11 @@
 import Debug from 'debug'
-import ceramic, { TileDocument } from './ceramic.js'
+import crypto from 'crypto'
+import ceramic, { TileDocument, createDid } from './ceramic.js'
 
 const debug = Debug('jlinx')
 
 export class JlinxClient {
 
-  static createDid(){
-
-  }
 
   constructor(did){
     debug('new JlinxClient', { did })
@@ -27,12 +25,13 @@ export class JlinxClient {
     return doc
   }
 
-  async create(content, opts = {}){
+  async create(content, { metadata, ...opts } = {}){
     const doc = await TileDocument.create(
       ceramic,
       content,
       metadata,
       {
+        ...opts,
         asDID: this.did
       }
     )
@@ -53,20 +52,49 @@ class JlinxPlugin {
 }
 
 class JlinxIdentifiers extends JlinxPlugin {
-  async create(){
-
+  async create(...opts){
+    // // Activate the account by somehow getting its seed.
+    // // See further down this page for more details on
+    // // seed format, generation, and key management.
+    // const seed = Buffer.alloc(32)
+    // crypto.randomFillSync(seed)
+    // debug('identifiers create', { seed: seed.toString('hex') })
+    // // const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519')
+    // const provider = new Ed25519Provider(seed)
+    // debug('identifiers create', { provider })
+    // // Create the DID object
+    // const did = new DID({ provider, resolver: getResolver() })
+    // debug('identifiers create', { did })
+    // // Authenticate with the provider
+    // await did.authenticate()
+    // // Mount the DID object to your Ceramic object
+    // ceramic.did = did
+    const did = await createDid()
+    // const doc = await this.jlinxClient.create(...opts)
+    return new Identifier(this, did)
   }
-  async get(){
-
+  async get(did){
+    // const doc = await this.jlinxClient.get(...opts)
+    did = '???'
+    return new Identifier(this, did)
   }
 }
+
+class Identifier {
+  constructor(jlinxClient, doc){
+    this.jlinxClient = jlinxClient
+    this.doc = doc
+  }
+}
+
 
 class JlinxProfiles extends JlinxPlugin {
   async create(...opts){
     const doc = await this.jlinxClient(...opts)
     return new Profile(this, doc)
   }
-  async get(){
+  async get(...opts){
+    const doc = await this.jlinxClient.get(...opts)
     return new Profile(this, doc)
   }
 }

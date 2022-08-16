@@ -66,8 +66,8 @@ function Index(){
 
 function New() {
   const navigate = useNavigate()
-  const [ profileId, setProfileId ] = useState('')
-  const [myProfiles = [], {loading: loadingMyProfiles, error: errorLoadingMyProfiles}] = useMyProfiles()
+  // const [ profileId, setProfileId ] = useState('')
+  // const [myProfiles = [], {loading: loadingMyProfiles, error: errorLoadingMyProfiles}] = useMyProfiles()
 
   const createIdentifier = useCreateIdentifier({
     onSuccess(identifier){
@@ -87,7 +87,7 @@ function New() {
     onSubmit(event){
       event.preventDefault()
       createIdentifier({
-        profileId,
+        // profileId,
       })
     }
   }}>
@@ -95,6 +95,7 @@ function New() {
       New Identifier
     </Typography>
 
+    {/*
     <Typography variant="body1" sx={{my: 2}}>
       Which profile fo you want to associate with this identifier?
     </Typography>
@@ -134,7 +135,7 @@ function New() {
           </MenuItem>
         )}
       </Select>
-    </FormControl>
+    </FormControl> */}
 
     {createIdentifier.error && <ErrorMessage error={createIdentifier.error} />}
     <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>

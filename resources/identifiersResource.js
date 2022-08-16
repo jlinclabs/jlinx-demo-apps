@@ -9,6 +9,7 @@ const identifiers = {
         where: { id },
         select: { userId: true, createdAt: true }
       })
+      const jlinx = new JlinxClient()
       const identifier = await jlinx.identifiers.get(id)
       return identifierToJSON({ identifier, record })
     },
@@ -19,6 +20,7 @@ const identifiers = {
       })
       return await Promise.all(
         records.map(async record => {
+          const jlinx = new JlinxClient()
           const identifier = await jlinx.identifiers.get(record.id)
           return identifierToJSON({ identifier, record })
         })
@@ -27,30 +29,16 @@ const identifiers = {
   },
 
   commands: {
-    async create({ userId, profileId }){
-      console.log('identifiers.commands.create', { userId, profileId })
-      const profileRecord = profileId
-        ? await profiles.queries.byId({ id: profileId })
-        : null
-
-      if (profileRecord && profileRecord.userId !== userId){
-        throw new Error(`invalid profileId`)
-      }
-
-      const profile = await jlinx.profiles.get(profileId)
+    async create({ userId }){
+      console.log('identifiers.commands.create', { userId })
+      const jlinx = new JlinxClient()
       const identifier = await jlinx.identifiers.create()
-      if (profile) {
-        await identifier.addService({
-          id: profile.id,
-          type: 'jlinx.profile',
-          serviceEndpoint: profile.serviceEndpoint,
-        })
-      }
-
+      console.log({ identifier })
       const record = await db.identifier.create({
         data: { id: identifier.id, userId },
         select: { userId: true, createdAt: true },
       })
+      console.log({ record })
       return identifierToJSON({ identifier, record })
     },
   },

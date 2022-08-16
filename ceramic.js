@@ -18,11 +18,34 @@ const ceramic = new CeramicClient(API_URL)
 // ↑ With this setup, you can perform read-only queries.
 // ↓ Continue to authenticate the account and perform transactions.
 
+async function createDid(){
+  // seed format, generation, and key management.
+  const seed = Buffer.alloc(32)
+  crypto.randomFillSync(seed)
+  // debug('identifiers create', { seed: seed.toString('hex') })
+  // const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519')
+  const provider = new Ed25519Provider(seed)
+  // debug('identifiers create', { provider })
+  const did = new DID({ provider, resolver: getResolver() })
+  did.seed = seed
+  // debug('identifiers create', { did })
+  // Authenticate with the provider
+  await did.authenticate()
+  return did
+}
+
+async function getDid(did){
+
+}
 
 export default ceramic
 export {
   TileDocument,
+  createDid,
+  getDid,
 }
+
+
 
 // async function authenticateCeramic(seed) {
 //   // Activate the account by somehow getting its seed.
