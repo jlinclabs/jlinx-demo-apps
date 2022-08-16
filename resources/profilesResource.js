@@ -1,5 +1,5 @@
 import db from '../prisma/client.js'
-// import jlinx from '../jlinx.js'
+import { JlinxClient } from '../jlinx.js'
 
 const profiles = {
   queries: {
@@ -28,11 +28,13 @@ const profiles = {
   commands: {
     async create({ userId, profile: value }){
       const profile = await jlinx.profiles.create({
-        header: ({id}) => ({
-          serviceEndpoint: `${process.env.URL}/jlinx/profiles/${id}`
-        })
+        ...value,
+        // header: ({id}) => ({
+        //   serviceEndpoint: `${process.env.URL}/jlinx/profiles/${id}`
+        // })
+        serviceEndpoint: `${process.env.URL}/jlinx/profiles/:id`
       })
-      await profile.set(value)
+      // await profile.set(value)
       console.log('profiles.create', profile, profile.value)
       const record = await db.profile.create({
         data: { id: profile.id, userId },

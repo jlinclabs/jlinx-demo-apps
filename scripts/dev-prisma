@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+CMD="npx prisma $@"
+
+exec concurrently \
+  --kill-others \
+  --names "cat-walkers,bad-birders,dope-dogs" \
+  "dotenv -e ./dev/cat-walkers/env ${CMD}" \
+  "dotenv -e ./dev/bad-birders/env ${CMD}" \
+  "dotenv -e ./dev/dope-dogs/env ${CMD}"

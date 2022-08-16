@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import prisma from '../prisma/client.js'
+import { JlinxClient } from '../jlinx.js'
 
 const sessionResource = {
 

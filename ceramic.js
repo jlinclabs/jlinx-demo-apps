@@ -1,4 +1,4 @@
-import env from '../environment.cjs'
+import env from './environment.js'
 import { CeramicClient } from '@ceramicnetwork/http-client'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { DID } from 'dids'
@@ -20,6 +20,9 @@ const ceramic = new CeramicClient(API_URL)
 
 
 export default ceramic
+export {
+  TileDocument,
+}
 
 // async function authenticateCeramic(seed) {
 //   // Activate the account by somehow getting its seed.
