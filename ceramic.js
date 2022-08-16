@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import env from './environment.js'
 import { CeramicClient } from '@ceramicnetwork/http-client'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
@@ -12,30 +13,20 @@ import { getResolver } from 'key-did-resolver'
 // const API_URL = 'http://0.0.0.0:7007'
 const API_URL = env.CERAMIC_API_URL
 
-// Create the Ceramic object
 const ceramic = new CeramicClient(API_URL)
 
-// ↑ With this setup, you can perform read-only queries.
-// ↓ Continue to authenticate the account and perform transactions.
-
 async function createDid(){
-  // seed format, generation, and key management.
   const seed = Buffer.alloc(32)
   crypto.randomFillSync(seed)
-  // debug('identifiers create', { seed: seed.toString('hex') })
-  // const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519')
-  const provider = new Ed25519Provider(seed)
-  // debug('identifiers create', { provider })
-  const did = new DID({ provider, resolver: getResolver() })
-  did.seed = seed
-  // debug('identifiers create', { did })
-  // Authenticate with the provider
-  await did.authenticate()
-  return did
+  const did = getDid(seed)
+  return { did, seed }
 }
 
-async function getDid(did){
-
+async function getDid(seed){
+  const provider = new Ed25519Provider(seed)
+  const did = new DID({ provider, resolver: getResolver() })
+  await did.authenticate()
+  return did
 }
 
 export default ceramic
