@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import prisma from '../prisma/client.js'
+import { createDid } from '../ceramic.js'
 import { JlinxClient } from '../jlinx.js'
 import users from './usersResource.js'
 
@@ -59,23 +60,20 @@ const sessionResource = {
       if (session.userId){
         throw new Error(`please logout first`)
       }
-      const secretKeySalt = await bcrypt.genSalt(10)
-      const secretKeyHash = await bcrypt.hash(secretKey, secretKeySalt)
+      // const secretKeySalt = await bcrypt.genSalt(10)
+      // const secretKeyHash = await bcrypt.hash(secretKey, secretKeySalt)
+      // const { did, seed: didSeed } = await createDid()
       // const user = await prisma.user.create({
-      const user = await users.commands.create({
-        secretKeyHash,
-        secretKeySalt,
-      })
+      const user = await users.commands.create({ secretKey })
+
       await session.setUserId(user.id)
       // await session.save();
     },
 
-    async login({ session, email, password }){
-      const user = await prisma.user.findUnique({
-        where: { email }
-      })
-      const match = await bcrypt.compare(password, user.passwordHash)
-      if (!match){ throw new Error(`invalid email or password`)}
+    async login({ session, secretKey }){
+      const user = await users.queries.findBySecretKey(secretKey)
+      // const match = await bcrypt.compare(password, user.passwordHash)
+      if (!user){ throw new Error(`invalid email or password`)}
       await session.setUserId(user.id)
     },
 

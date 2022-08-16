@@ -9,14 +9,13 @@ generator client {
 }
 
 model User {
-  id                  Int          @id @default(autoincrement())
-  createdAt           DateTime     @default(now())
-  secretKeySalt       String
-  secretKeyHash       String
-  sessions            Session[]
-  identifiers         Identifier[]
-  profiles            Profile[]
-  contracts           Contract[]
+  id          Int          @id @default(autoincrement())
+  createdAt   DateTime     @default(now())
+  secretKey   String       @unique
+  sessions    Session[]
+  identifiers Identifier[]
+  profiles    Profile[]
+  contracts   Contract[]
 }
 
 model Session {

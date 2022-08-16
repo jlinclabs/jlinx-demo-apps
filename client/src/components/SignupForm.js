@@ -1,6 +1,5 @@
 import { useState } from 'react'
 
-import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
@@ -12,10 +11,8 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import AutorenewIcon from '@mui/icons-material/Autorenew'
 
-import Layout from '../Layout'
-import Link from './Link'
 import ErrorMessage from './ErrorMessage'
-import { useCurrentUser, useSignup } from '../resources/session'
+import { useSignup } from '../resources/session'
 
 export default function SignupForm(props){
   const [agreed, setAgreed] = useState(false)

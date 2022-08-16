@@ -2,18 +2,23 @@ import prisma from '../prisma/client.js'
 
 const users = {
   queries: {
+    async findBySecretKey(secretKey){
+      return await prisma.user.findUnique({
+        where: { secretKey },
+        select: {
+          id: true,
+          createdAt: true,
+        }
+      })
+    }
 
   },
 
   commands: {
-    async create({ secretKeyHash, secretKeySalt }){
-      const record = await prisma.user.create({
-        data: {
-          secretKeyHash,
-          secretKeySalt,
-        }
+    async create({ secretKey }){
+      return await prisma.user.create({
+        data: { secretKey }
       })
-      return record
     }
   },
 
