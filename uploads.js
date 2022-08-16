@@ -2,7 +2,7 @@ import Path from 'path'
 import express from 'express'
 import Router from 'express-promise-router'
 import multer from 'multer'
-import uuid from 'uuid/v1.js'
+import { v1 as uuid } from 'uuid'
 
 const MOUNT_POINT = '/api/uploads'
 const UPLOADS_PATH = process.env.UPLOADS_PATH

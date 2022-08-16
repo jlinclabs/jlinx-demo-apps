@@ -1,5 +1,5 @@
 import db from '../prisma/client.js'
-import jlinx from '../jlinx.js'
+// import jlinx from '../jlinx.js'
 import profiles from './profilesResource.js'
 
 const identifiers = {
