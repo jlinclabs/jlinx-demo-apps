@@ -27,11 +27,11 @@ model Session {
 }
 
 model Identifier {
-  did       String   @id
-  createdAt DateTime @default(now())
-  secretKey String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
+  id         String   @id
+  createdAt  DateTime @default(now())
+  secretSeed String
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
 }
 
 model Profile {

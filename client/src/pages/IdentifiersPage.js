@@ -70,9 +70,9 @@ function New() {
   // const [myProfiles = [], {loading: loadingMyProfiles, error: errorLoadingMyProfiles}] = useMyProfiles()
 
   const createIdentifier = useCreateIdentifier({
-    onSuccess(identifier){
-      console.log('CREATED', { identifier })
-      navigate(`/identifiers/${identifier.id}`)
+    onSuccess(did){
+      console.log('CREATED', { did })
+      navigate(`/identifiers/${did}`)
     },
     onFailure(error){
       console.error(error)
@@ -179,8 +179,8 @@ function Identifier({ id, ...props }){
   const [identifier, { loading, error }] = useIdentifier(id)
   if (!identifier) return <CircularProgress/>
   if (error) return <ErrorMessage {...{ error }}/>
-  const did = identifier.didDocument.id
-  const editable = identifier.writable
+  const did = identifier.id
+  const editable = identifier.ours
 
   return <Box {...props}>
     <Stack flexDirection="row" justifyContent="space-between">
@@ -194,14 +194,14 @@ function Identifier({ id, ...props }){
       >
         {`Identifier`}
       </Typography>
-      <LinkToJlinxHost
+      {/* <LinkToJlinxHost
         host={identifier.header.host}
         id={identifier.id}
-      />
+      /> */}
     </Stack>
     <Box>
       <Typography variant="h7">
-        <Link to={`/identifiers/${id}/did-document`}>{`DID: ${did}`}</Link>
+        <Link to={`/identifiers/${id}`}>{`DID: ${did}`}</Link>
       </Typography>
     </Box>
     <Box my={2}>
@@ -211,13 +211,13 @@ function Identifier({ id, ...props }){
       </Typography>
     </Box>
 
-    <Box mt={2}>
+    {/* <Box mt={2}>
       <Typography variant="h6">Profile:</Typography>
       {identifier.profileId
         ? <Profile id={identifier.profileId} />
         : null
       }
-    </Box>
+    </Box> */}
 
     {editable
       ? <Stack
@@ -232,6 +232,12 @@ function Identifier({ id, ...props }){
       </Stack>
       : null
     }
+
+    <Box>
+      <Typography variant="h7">DID Document</Typography>
+      <InspectObject object={identifier.didDocument}/>
+    </Box>
+
 
   </Box>
 }

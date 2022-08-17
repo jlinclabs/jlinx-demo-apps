@@ -29,7 +29,7 @@ export default function Layout(props) {
   } = props
   const { currentUser, loading } = useCurrentUser({
     redirectToIfFound: requireNotLoggedIn ? '/' : undefined,
-    redirectToIfNotFound: requireLoggedIn ? '/login' : undefined,
+    redirectToIfNotFound: requireLoggedIn ? '/' : undefined,
   })
   console.log(`currentUser => ${JSON.stringify(currentUser)}`)
 
@@ -69,14 +69,14 @@ function SideNav({ loading, currentUser }) {
     ) :
     currentUser ? <>
       <NavButton {...{
-        icon: <PersonIcon/>,
-        text: 'Profiles',
-        to: '/profiles',
-      }}/>
-      <NavButton {...{
         icon: <AccountBoxOutlinedIcon/>,
         text: 'Identifiers',
         to: '/identifiers',
+      }}/>
+      <NavButton {...{
+        icon: <PersonIcon/>,
+        text: 'Profiles',
+        to: '/profiles',
       }}/>
       <NavButton {...{
         icon: <ArticleOutlinedIcon/>,

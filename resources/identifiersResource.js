@@ -1,28 +1,38 @@
 import db from '../prisma/client.js'
+import { createDid } from '../ceramic.js'
 import { JlinxClient } from '../jlinx.js'
 import profiles from './profilesResource.js'
 
 const identifiers = {
   queries: {
-    async byId({ id }){
+    async byId({ id, userId }){
       const record = await db.identifier.findUnique({
         where: { id },
-        select: { userId: true, createdAt: true }
+        select: {
+          id: true,
+          userId: true,
+          createdAt: true,
+          secretSeed: true,
+        }
       })
-      const jlinx = new JlinxClient()
-      const identifier = await jlinx.identifiers.get(id)
-      return identifierToJSON({ identifier, record })
+      const did = await getDidFromCeramic({ userId, id, record })
+      return identifierToJSON({ userId, record, did })
     },
 
     async forUser(userId){
       const records = await db.identifier.findMany({
-        where: { userId }
+        where: { userId },
+        select: {
+          id: true,
+          userId: true,
+          createdAt: true,
+          secretSeed: true,
+        }
       })
       return await Promise.all(
         records.map(async record => {
-          const jlinx = new JlinxClient()
-          const identifier = await jlinx.identifiers.get(record.id)
-          return identifierToJSON({ identifier, record })
+          const did = await getDidFromCeramic({ userId, id: record.id, record })
+          return identifierToJSON({ userId, record, did })
         })
       )
     }
@@ -32,25 +42,29 @@ const identifiers = {
     async create({ userId }){
       console.log('identifiers.commands.create', { userId })
       const jlinx = new JlinxClient()
-      const identifier = await jlinx.identifiers.create()
-      console.log({ identifier })
-      const record = await db.identifier.create({
-        data: { id: identifier.id, userId },
-        select: { userId: true, createdAt: true },
+      const did = await jlinx.dids.create()
+      console.log('identifiers.commands.create', { did })
+      await db.identifier.create({
+        data: {
+          id: did.id,
+          userId,
+          secretSeed: did.secretSeed.toString('hex'),
+        }
       })
-      console.log({ record })
-      return identifierToJSON({ identifier, record })
+      return did.id
+      // console.log({ record })
+      // return identifierToJSON({ identifier, record })
     },
   },
 
   actions: {
     async create({ currentUser, profileId }){
-      const identifier = await identifiers.commands.create({
+      const id = await identifiers.commands.create({
         userId: currentUser.id,
         profileId
       })
-      console.log('identifiers.create', identifier)
-      return identifier
+      console.log('identifiers.create', id)
+      return id
     },
   },
 
@@ -60,23 +74,37 @@ const identifiers = {
         ? await identifiers.queries.forUser(currentUser.id)
         : []
     },
-    ':id': async ({ id }) => {
-      return await identifiers.queries.byId({ id })
+    ':id': async ({ currentUser, id }) => {
+      return await identifiers.queries.byId({ id, userId: currentUser.id })
     }
   }
 }
 
 export default identifiers
 
-function identifierToJSON({ identifier, record }){
-  record = record || {}
-  const profileService = identifier.state.services
-    .find(service => service.type === 'jlinx.profile')
-  return {
-    ...identifier.toJSON(),
-    createdAt: record.createdAt,
-    userId: record.userId,
-    didDocument: identifier.asDidDocument(),
-    profileId: profileService ? profileService.id : undefined,
+async function getDidFromCeramic({ userId, id, record }){
+  console.log('getDidFromCeramic', { userId, id, record })
+  let secretSeed
+  if (record && record.userId === userId) {
+    secretSeed = Buffer.from(record.secretSeed, 'hex')
   }
+  const jlinx = new JlinxClient()
+  return await jlinx.dids.get(id, secretSeed)
+}
+
+function identifierToJSON({ userId, record, did }){
+  console.log('identifierToJSON', { record, did })
+  let data
+  if (record){
+    data = data || {}
+    data.id = record.id
+    data.createdAt = record.createdAt
+    data.ours = record.userId === userId
+  }
+  if (did){
+    data = data || {}
+    data.id = did.id
+    data.didDocument = did.didDocument
+  }
+  return data
 }

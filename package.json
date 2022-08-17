@@ -12,8 +12,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@3id/did-provider": "^0.4.1",
     "@ceramicnetwork/http-client": "^2.3.1",
     "@ceramicnetwork/stream-tile": "^2.4.0",
+    "@glazed/did-datastore": "^0.3.2",
     "@prisma/client": "^4.2.1",
     "b4a": "^1.6.0",
     "bcrypt": "^5.0.1",

@@ -1,17 +1,17 @@
 import Debug from 'debug'
 import crypto from 'crypto'
-import ceramic, { TileDocument, createDid } from './ceramic.js'
+import { randomBytes } from '@stablelib/random'
+import ceramic, { TileDocument, createDid, getDid, resolveDidDocument } from './ceramic.js'
 
 const debug = Debug('jlinx')
 
 export class JlinxClient {
 
-
   constructor(did){
     debug('new JlinxClient', { did })
     this.did = did
     // this.userId  = userId
-    this.identifiers = new JlinxIdentifiers(this)
+    this.dids = new JlinxDids(this)
     this.profiles = new JlinxProfiles(this)
   }
 
@@ -43,48 +43,43 @@ class JlinxPlugin {
   constructor(jlinxClient){
     this.jlinxClient = jlinxClient
   }
-  async create(){
-
-  }
-  async get(){
-
-  }
 }
 
-class JlinxIdentifiers extends JlinxPlugin {
+class JlinxDids extends JlinxPlugin {
   async create(...opts){
-    // // Activate the account by somehow getting its seed.
-    // // See further down this page for more details on
-    // // seed format, generation, and key management.
-    // const seed = Buffer.alloc(32)
-    // crypto.randomFillSync(seed)
-    // debug('identifiers create', { seed: seed.toString('hex') })
-    // // const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519')
-    // const provider = new Ed25519Provider(seed)
-    // debug('identifiers create', { provider })
-    // // Create the DID object
-    // const did = new DID({ provider, resolver: getResolver() })
-    // debug('identifiers create', { did })
-    // // Authenticate with the provider
-    // await did.authenticate()
-    // // Mount the DID object to your Ceramic object
-    // ceramic.did = did
-    const did = await createDid()
-    // const doc = await this.jlinxClient.create(...opts)
-    return new Identifier(this, did)
+    const { jlinxClient } = this
+    const { did, secretSeed } = await createDid(...opts)
+    const didDocument = await resolveDidDocument(did.id)
+    return new Did({
+      jlinxClient,
+      did,
+      secretSeed,
+      didDocument,
+    })
   }
-  async get(did){
-    // const doc = await this.jlinxClient.get(...opts)
-    did = '???'
-    return new Identifier(this, did)
+  async get(didString, secretSeed){
+    // const did = await getDid(didString, secretSeed)
+    // return new Did(this, did, secretSeed)
+    const { jlinxClient } = this
+    const did = secretSeed ? await getDid(didString, secretSeed) : undefined
+    const didDocument = await resolveDidDocument(didString)
+    return new Did({
+      jlinxClient,
+      // did,
+      secretSeed,
+      didDocument,
+    })
   }
 }
 
-class Identifier {
-  constructor(jlinxClient, doc){
-    this.jlinxClient = jlinxClient
-    this.doc = doc
+class Did {
+  constructor(opts = {}){
+    this.jlinxClient = opts.jlinxClient
+    this.did = opts.did
+    this.secretSeed = opts.secretSeed
+    this.didDocument = opts.didDocument
   }
+  get id () { return this.didDocument.id }
 }
 
 

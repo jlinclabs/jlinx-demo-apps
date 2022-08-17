@@ -4,37 +4,100 @@ import { CeramicClient } from '@ceramicnetwork/http-client'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { DID } from 'dids'
 import { Ed25519Provider } from 'key-did-provider-ed25519'
-import { getResolver } from 'key-did-resolver'
+import { getResolver as getDidKeyResolver } from 'key-did-resolver'
+import { ThreeIdProvider } from '@3id/did-provider'
+import { Resolver as DidResolver } from 'did-resolver'
+import { getResolver as getDid3IDResolver } from '@ceramicnetwork/3id-did-resolver'
 
-// Connect to a Ceramic node
-// const API_URL = 'https://cas-clay.3boxlabs.com'
-// const API_URL = 'https://ceramic-clay.3boxlabs.com'
-// const API_URL = 'https://gateway-clay.ceramic.network'
-// const API_URL = 'http://0.0.0.0:7007'
 const API_URL = env.CERAMIC_API_URL
 
 const ceramic = new CeramicClient(API_URL)
 
-async function createDid(){
-  const seed = Buffer.alloc(32)
-  crypto.randomFillSync(seed)
-  const did = getDid(seed)
-  return { did, seed }
+// https://developers.ceramic.network/reference/accounts/3id-did/#3id-did-provider
+const app3id = await ThreeIdProvider.create({
+  ceramic,
+  authId: `jlinx-demo-app-${env.APP_NAME}`,
+  // TODO get from env
+  authSecret: Buffer.from('593df14c304756ba60c85136acd4aeab36153e55944a2a011eb2ea7fe5f8b00f', 'hex'),
+  async getPermission(request){ return request.payload.paths },
+})
+
+console.log('APP app3id', app3id)
+console.log('APP app3id.keychain', app3id.keychain)
+console.log('APP app3id.keychain.status', app3id.keychain.status())
+console.log('APP app3id.keychain.list', await app3id.keychain.list())
+
+export async function createDid(){
+  const secretSeed = Buffer.alloc(32)
+  crypto.randomFillSync(secretSeed)
+
+  // https://developers.ceramic.network/reference/accounts/3id-did/#3id-did-provider
+  const threeID = await ThreeIdProvider.create({
+    ceramic,
+    seed: secretSeed,
+    async getPermission(request){ return request.payload.paths },
+  })
+
+  const did = new DID({
+    provider: threeID.getDidProvider(),
+    resolver: {
+      ...getDid3IDResolver(ceramic),
+      ...getDidKeyResolver(),
+    },
+  })
+
+  await did.authenticate()
+
+  // return the did and secret so we can store the secret safely
+  return { did, secretSeed }
 }
 
-async function getDid(seed){
-  const provider = new Ed25519Provider(seed)
-  const did = new DID({ provider, resolver: getResolver() })
+export async function getDid(didString, secretSeed){
+  // TODO fail fast on did ≠ secret mismatch
+
+  // https://developers.ceramic.network/reference/accounts/3id-did/#3id-did-provider
+  const threeID = await ThreeIdProvider.create({
+    ceramic,
+    seed: secretSeed,
+    did: didString,
+    async getPermission(request){ return request.payload.paths },
+  })
+  const did = new DID({
+    provider: threeID.getDidProvider(),
+    resolver: {
+      ...getDid3IDResolver(ceramic),
+      ...getDidKeyResolver(),
+    },
+  })
   await did.authenticate()
+  if (did.id !== didString){
+    throw new Error(`resolved the wrong did: "${did.id}" !== "${didString}"`)
+  }
   return did
 }
 
-export default ceramic
-export {
-  TileDocument,
-  createDid,
-  getDid,
+const didResolver = new DidResolver(
+  {
+    ...getDid3IDResolver(ceramic),
+    ...getDidKeyResolver(),
+  },
+  {}
+)
+
+export async function resolveDidDocument(didString){
+  const {
+    didResolutionMetadata,
+    didDocument,
+    didDocumentMetadata,
+  } = await didResolver.resolve(didString)
+  if (didDocument.id !== didString){
+    throw new Error(`resolved the wrong did: "${did.id}" !== "${didString}"`)
+  }
+  return didDocument
 }
+
+export default ceramic
+export { TileDocument }
 
 
 

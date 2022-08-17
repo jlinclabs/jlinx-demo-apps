@@ -8,10 +8,10 @@ const users = {
         select: {
           id: true,
           createdAt: true,
+          secretKey: false //!
         }
       })
     }
-
   },
 
   commands: {

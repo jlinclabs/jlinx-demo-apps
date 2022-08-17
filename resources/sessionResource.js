@@ -3,6 +3,7 @@ import prisma from '../prisma/client.js'
 import { createDid } from '../ceramic.js'
 import { JlinxClient } from '../jlinx.js'
 import users from './usersResource.js'
+import identifiers from './identifiersResource.js'
 
 const sessionResource = {
 
@@ -19,6 +20,7 @@ const sessionResource = {
             select: {
               id: true,
               // did: true,
+              secretKey: false, // !
               // email: true,
               // name: true,
               createdAt: true,
@@ -60,13 +62,10 @@ const sessionResource = {
       if (session.userId){
         throw new Error(`please logout first`)
       }
-      // const secretKeySalt = await bcrypt.genSalt(10)
-      // const secretKeyHash = await bcrypt.hash(secretKey, secretKeySalt)
-      // const { did, seed: didSeed } = await createDid()
-      // const user = await prisma.user.create({
       const user = await users.commands.create({ secretKey })
-
-      await session.setUserId(user.id)
+      const userId = user.id
+      await identifiers.commands.create({ userId })
+      await session.setUserId(userId)
       // await session.save();
     },
 
