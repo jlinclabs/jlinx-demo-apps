@@ -11,14 +11,15 @@ import { getResolver as getDid3IDResolver } from '@ceramicnetwork/3id-did-resolv
 
 const API_URL = env.CERAMIC_API_URL
 
+console.log('API_URL', env.CERAMIC_API_URL)
+
 const ceramic = new CeramicClient(API_URL)
 
 // https://developers.ceramic.network/reference/accounts/3id-did/#3id-did-provider
 const app3id = await ThreeIdProvider.create({
   ceramic,
   authId: `jlinx-demo-app-${env.APP_NAME}`,
-  // TODO get from env
-  authSecret: Buffer.from('593df14c304756ba60c85136acd4aeab36153e55944a2a011eb2ea7fe5f8b00f', 'hex'),
+  authSecret: Buffer.from(env.CERAMIC_NODE_SECRET, 'hex'),
   async getPermission(request){ return request.payload.paths },
 })
 

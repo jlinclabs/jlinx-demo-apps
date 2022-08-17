@@ -30,3 +30,4 @@ yarn-error.log*
 /dev/*/jlinx.vault
 /dev/*/uploads
 dev/apps
+/dev/*/prod.env
