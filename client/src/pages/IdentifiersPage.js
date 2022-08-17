@@ -204,12 +204,13 @@ function Identifier({ id, ...props }){
         <Link to={`/identifiers/${id}`}>{`DID: ${did}`}</Link>
       </Typography>
     </Box>
-    <Box my={2}>
+
+    {/* <Box my={2}>
       <Typography variant="h7">
         {'Created: '}
         <Timestamp at={identifier.createdAt}/>
       </Typography>
-    </Box>
+    </Box> */}
 
     {/* <Box mt={2}>
       <Typography variant="h6">Profile:</Typography>
@@ -315,9 +316,9 @@ function MyIdentifier({ identifier, profile = {} }){
           },
         },
         primary: `${identifier.id}`,
-        secondary: <span>
-          created <Timestamp at={identifier.createdAt}/>
-        </span>
+        // secondary: <span>
+        //   created <Timestamp at={identifier.createdAt}/>
+        // </span>
       }}/>
     </ListItemButton>
   </ListItem>
