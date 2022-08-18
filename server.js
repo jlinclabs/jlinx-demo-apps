@@ -7,6 +7,7 @@ import Router from 'express-promise-router'
 import uploads from './uploads.js'
 import Session from './Session.js'
 import { getView, takeAction } from './resources/index.js'
+import ceramicRestApi from './ceramicRestApi.js'
 
 const app = express()
 
@@ -26,6 +27,7 @@ app.use(async (req, res, next) => {
 })
 
 app.use(uploads)
+app.use(ceramicRestApi)
 
 // ROUTES
 const router = Router()
