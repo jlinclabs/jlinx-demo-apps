@@ -32,6 +32,8 @@ import Timestamp from '../components/Timestamp'
 import ErrorMessage from '../components/ErrorMessage'
 import IdentifierProfile from '../components/IdentifierProfile'
 import IdentifierSelectInput from '../components/IdentifierSelectInput'
+import LinkToDid from '../components/LinkToDid'
+import CeramicStreamEvents from '../components/CeramicStreamEvents'
 import InspectObject from '../components/InspectObject'
 
 export default function Contracts() {
@@ -204,6 +206,19 @@ function SignContractOfferingForm({ contractId }){
   if (loading) return <span>Loading…</span>
   const disabled = signContract.pending
 
+  if (contract && contract.state !== 'offered'){
+    return <Paper {...{
+      elevation: 3,
+      sx: { p: 2, mt: 2 },
+    }}>
+      <Typography component="h1" variant="h3" mb={3}>
+        Contract Already Signed!
+      </Typography>
+
+      <InspectObject object={contract}/>
+    </Paper>
+  }
+
   return <Paper {...{
     elevation: 3,
     component: 'form',
@@ -227,12 +242,13 @@ function SignContractOfferingForm({ contractId }){
     <Typography paragraph>
       {`The contract`}<br/>
       <Link to={contract.contractUrl}>{contract.contractUrl}</Link><br/>
-      {`is being offered to you by:`}<br/>
+      {`is being offered to you by: `}
+      <LinkToDid did={contract.offerer}/>
     </Typography>
 
-    <Paper elevation={2} sx={{p: 2, m: 2}}>
+    {/* <Paper elevation={2} sx={{p: 2, m: 2}}>
       <IdentifierProfile identifierId={contract.offerer}/>
-    </Paper>
+    </Paper> */}
 
     {signatureId
       ? <>
@@ -278,6 +294,12 @@ function Contract({ contract }){
       <LinkToCeramicApi endpoint={contract.id}/>
     </Stack>
 
+
+    <Box my={2}>
+      <Typography variant="h6">ID</Typography>
+      <LinkToCeramicApi endpoint={contract.id}>{contract.id}</LinkToCeramicApi>
+    </Box>
+
     {contract.contractUrl
       ? <Box my={2}>
         <Typography variant="h6">
@@ -290,19 +312,13 @@ function Contract({ contract }){
 
     <Box my={2}>
       <Typography variant="h6">Offered by</Typography>
-      <Paper elevation={3} sx={{p: 2}}>
-        <IdentifierProfile identifierId={contract.offerer}/>
-      </Paper>
+      <LinkToDid did={contract.offerer}/>
     </Box>
 
 
     <Box my={2}>
       <Typography variant="h6">Offered at</Typography>
       <Timestamp at={contract.createdAt}/>
-    </Box>
-    <Box my={2}>
-      <Typography variant="h6">ID</Typography>
-      <Typography variant="body1">{contract.id}</Typography>
     </Box>
 
     {contract.state === 'offered'
@@ -326,13 +342,16 @@ function Contract({ contract }){
     }
 
     {contract.state === 'signed' && <>
-      <Typography paragraph>Signed by</Typography>
-      <Paper elevation={2}>
+      <Typography variant="h6">Signed by</Typography>
+      <LinkToDid did={contract.signer}/>
+      {/* <Paper elevation={2}>
         <IdentifierProfile identifierId={contract.signer}/>
-      </Paper>
+      </Paper> */}
     </>}
 
     {/* <InspectObject object={contract}/> */}
+    <Typography variant="h6">Events</Typography>
+    <CeramicStreamEvents id={contract.id}/>
   </Paper>
 }
 
