@@ -13,7 +13,7 @@ import PersonIcon from '@mui/icons-material/Person'
 import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined'
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined'
-import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined'
+import HomeIcon from '@mui/icons-material/Home'
 
 import { useCurrentUser } from './resources/session'
 import Link from './components/Link'
@@ -107,7 +107,7 @@ function SideNav({ loading, currentUser }) {
     </> :
     <>
       <NavButton {...{
-        icon: <LoginOutlinedIcon/>,
+        icon: <HomeIcon/>,
         text: 'Home',
         to: '/',
       }}/>
