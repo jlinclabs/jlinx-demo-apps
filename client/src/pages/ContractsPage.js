@@ -48,8 +48,6 @@ export default function Contracts() {
 }
 
 function Index(props) {
-  console.log('PAGE/contacts/index', props)
-
   return <Container maxwidth="lg">
     <Typography my={2} variant="h3">Contracts</Typography>
 

@@ -108,13 +108,8 @@ function SideNav({ loading, currentUser }) {
     <>
       <NavButton {...{
         icon: <LoginOutlinedIcon/>,
-        text: 'Login',
-        to: '/login',
-      }}/>
-      <NavButton {...{
-        icon: <ArticleOutlinedIcon/>,
-        text: 'Signup',
-        to: '/signup',
+        text: 'Home',
+        to: '/',
       }}/>
     </>
   )
