@@ -6,12 +6,16 @@ const contracts = {
   queries: {
 
     async byId({ id }){
+      const jlinx = new JlinxClient()
       const [contractRecord, jlinxContract] = await Promise.all([
         db.contract.findUnique({ where: { id } }),
         jlinx.contracts.get(id),
       ])
       if (!jlinxContract) return
-      const contract = {...jlinxContract.value, id}
+      const contract = {
+        ...jlinxContract.content,
+        id
+      }
       delete contract.contractId
       if (contractRecord){
         contract.userId = contractRecord.userId
@@ -40,43 +44,43 @@ const contracts = {
   commands: {
     async offer(options){
       const {
-        identifierDid,
+        identifierId,
         contractUrl,
         userId,
       } = options
 
-      // TODO ensure identifierDid exists and is ours
-      const jlinx = new JlinxClient(userId, identifierDid)
-      console.log('jlinx client', jlinx)
-      console.log('jlinx client did', await jlinx.getDid())
-      const contract = await jlinx.contracts.create()
-      await contract.offerContract({
-        offerer: identifierDid,
+      const jlinx = new JlinxClient(userId, identifierId)
+      const contract = await jlinx.contracts.offerContract({
+        // offerer: identifierId,
         contractUrl,
         signatureDropoffUrl: `${process.env.URL}/api/jlinx/contracts/signatures`
       })
-      console.log('CREATED CONTRACT', contract, contract.value)
+      const id = contract.id.toString()
       await db.contract.create({
         data: {
-          id: contract.id,
-          userId
+          id,
+          userId,
+          identifierId,
         },
       })
-      return { id: contract.id }
+      return { id }
     },
 
-    async sign({ contractId, userId, identifierDid }){
+    async sign({ contractId, userId, identifierId }){
+      if (!contractId) throw new Error('contractId is required')
+      if (!userId) throw new Error('userId is required')
+      if (!identifierId) throw new Error('identifierId is required')
+      console.log('SIGNING CONTRACT', { contractId, userId, identifierId })
+      const jlinx = new JlinxClient(userId, identifierId)
       const contract = await jlinx.contracts.get(contractId)
       if (!contract) throw new Error(`invalid contractId "${contractId}"`)
-      await contract.update()
-      console.log('SIGNING CONTRACT', { contract })
+      await contract.sync()
+      console.log('SIGNING CONTRACT', contract, contract.content)
 
       // TODO ensure valid contract for signing
-      // TODO ensure identifierDid is ours
-      const signature = await contract.sign({
-        identifier: identifierDid,
-      })
-      console.log('SIGNED CONTRACT', { signature })
+      // TODO ensure identifierId is ours
+      const signature = await contract.sign()
+      console.log('SIGNED CONTRACT', signature, signature.content)
 
       console.log('DROPPING OFF SIGNATURE', {
         signatureDropoffUrl: contract.signatureDropoffUrl,
@@ -84,25 +88,46 @@ const contracts = {
       await postJSON(
         contract.signatureDropoffUrl,
         {
-          signatureId: signature.id,
+          contractId,
+          signatureId: signature.id.toString(),
         }
       )
-      await contract.update()
-      console.log('DROPPED OFF SIGNATURE', { contract })
+      await contract.sync()
+      console.log('DROPPED OFF SIGNATURE', contract, contract.content)
       // TODO persist a record of this for the current user
       return { signatureId: signature.id }
     },
 
-    async ackSignature({ signatureId }){
+    async ackSignature({ signatureId, contractId }){
       console.log('ackSignature', { signatureId })
-      const contractParty = await jlinx.contracts.getParty(signatureId)
-      console.log('ackSignature', { contractParty })
-      const { contractId } = contractParty
-      console.log('ackSignature', { contractId })
-      const contract = await jlinx.contracts.get(contractId)
-      if (!contract) throw new Error(`invalid contractId "${contractId}"`)
-      await contract.ackSignerResponse(signatureId)
-      console.log('ACK\'d CONTRACT SIGNATURE', contract)
+
+      // get userid for contractId
+      const record = await db.contract.findUnique({
+        where: { id: contractId },
+        select: {
+          userId: true,
+          identifierId: true,
+        },
+      })
+      if (!record) throw new Error(`contract not found id=${contractId}`)
+
+      let jlinx = new JlinxClient(record.userId, record.identifierId)
+      const [contract, signature] = await Promise.all([
+        jlinx.contracts.get(contractId),
+        jlinx.contracts.getSignature(signatureId),
+      ])
+      console.log('ACK SIG', { contract, signature })
+
+      await contract.ackSignature(signature)
+
+      // const signature = await jlinx.contracts.getParty(signatureId)
+      // console.log('ackSignature', { signature })
+      // const { contractId } = signature
+      // console.log('ackSignature', { contractId })
+      // const contract = await jlinx.contracts.get(contractId)
+      // if (!contract) throw new Error(`invalid contractId "${contractId}"`)
+      // await contract.ackSignerResponse(signatureId)
+      console.log('ACK\'d CONTRACT SIGNATURE', contract, contract.content)
       return { contractId }
     },
   },
@@ -110,22 +135,22 @@ const contracts = {
   actions: {
     async offer({ currentUser, ...options }){
       return await contracts.commands.offer({
-        identifierDid: options.identifierDid,
+        identifierId: options.identifierId,
         contractUrl: options.contractUrl,
         userId: currentUser.id,
       })
     },
-    async sign({ currentUser, contractId, identifierDid }){
+    async sign({ currentUser, contractId, identifierId }){
       // TODO ensure signAs identifier did is owned by us
       return await contracts.commands.sign({
         userId: currentUser.id,
         contractId,
-        identifierDid,
+        identifierId,
       })
     },
     async ackSignature({ contractId, signatureId }){
       return await contracts.commands.ackSignature({
-        // userId: currentUser.id,
+        // userId: currentUser.id, // not current user for this one
         contractId,
         signatureId,
       })

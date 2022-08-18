@@ -59,11 +59,11 @@ router.post('/api/actions/*', async (req, res) => {
 })
 
 router.post('/api/jlinx/contracts/signatures', async (req, res) => {
-  const { signatureId } = req.body
+  const { contractId, signatureId } = req.body
   const result = await takeAction({
     actionId: 'contracts.ackSignature',
     session: req.session,
-    options: { signatureId },
+    options: { contractId, signatureId },
   })
   res.json(result)
 })

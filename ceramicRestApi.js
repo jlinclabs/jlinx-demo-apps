@@ -27,6 +27,7 @@ router.get('/api/ceramic/:streamId/meta', async (req, res) => {
   res.json({
     id: doc.id.toString(),
     // api: doc.api, // circular JSON
+    controllers: doc.controllers,
     content: doc.content,
     tip: doc.tip.toString(),
     commitId: doc.commitId.toString(),

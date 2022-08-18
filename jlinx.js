@@ -68,17 +68,27 @@ class JlinxDocument {
   }
   get id(){ return this.doc.id }
   get content(){ return this.doc.content }
+  get controllers(){ return this.doc.controllers }
   toJSON(){ return this.content }
+
+  async sync(){
+    await this.doc.sync({
+      // sync: SyncOptions.SYNC_ALWAYS // TODO
+    })
+  }
 
   async update(content, metadata, opts = {}) {
     await this.doc.update(content, metadata, {
       asDID: await this.jlinxClient.getDid(),
       ...opts
     })
-    await this.doc.sync({
-      // sync: SyncOptions.SYNC_ALWAYS // TODO
-    })
+    await this.sync()
     // TODO consider this.doc.requestAnchor()
+  }
+
+  async patch(patch, metadata, opts = {}) {
+    const content = {...this.content, ...patch}
+    await this.update(content, metadata, opts = {})
   }
 }
 
@@ -146,29 +156,93 @@ class JlinxContracts extends JlinxPlugin {
     const doc = await this.jlinxClient.create(...opts)
     return new Contract(this.jlinxClient, doc)
   }
+
   async get(...opts){
     const doc = await this.jlinxClient.get(...opts)
     return new Contract(this.jlinxClient, doc)
   }
-}
 
-class Contract {
-  constructor(jlinxClient, doc){
-    this.jlinxClient = jlinxClient
-    this.doc = doc
+  async offerContract(opts = {}){
+    const {
+      offerer = this.jlinxClient,
+      contractUrl,
+      signatureDropoffUrl
+    } = opts
+    return this.create({
+      state: 'offered',
+      offerer,
+      contractUrl,
+      signatureDropoffUrl
+    })
   }
 
-  offerContract(opts = {}){
+  async getSignature(...opts){
+    const doc = await this.jlinxClient.get(...opts)
+    return new ContractSignature(this.jlinxClient, doc)
+  }
+}
+
+class Contract extends JlinxDocument {
+
+  get state(){ return this.content?.state }
+  get offerer(){ return this.content?.offerer }
+  get contractUrl(){ return this.content?.contractUrl }
+  get signatureDropoffUrl(){ return this.content?.signatureDropoffUrl }
+  get signatureId(){ return this.content?.signatureId }
+
+  async offerContract(opts = {}){
     console.log('Offer Contract', this, this.doc)
     const {
       offerer,
       contractUrl,
       signatureDropoffUrl
     } = opts
+    await this.patch({
+      state: 'offered',
+      offerer,
+      contractUrl,
+      signatureDropoffUrl
+    })
+  }
 
+  async sign(){
+    const signature = await this.jlinxClient.create({
+      contractId: this.id.toString(),
+      identifierId: this.jlinxClient.did,
+    })
+    console.log('CREATED SIGNATURE', {
+      signature,
+      'signature.content': signature.content,
+      'signature.controllers': signature.controllers,
+    })
+    return signature
+  }
+
+  async ackSignature(signature){
+    if (this.state !== 'offered'){
+      throw new Error(`contract not in "offered" state.`)
+    }
+    await signature.sync()
+    if (signature.content.contractId !== this.id.toString()){
+      throw new Error(`signature.contractId does not match contract.id`)
+    }
+    const signer = signature.controllers[0]
+    if (!signer){
+      throw new Error(`signature has no controllers`)
+    }
+    await this.patch({
+      state: 'signed',
+      signatureDropoffUrl: undefined,
+      signatureId: signature.id.toString(),
+      signer,
+    })
   }
 }
 
+class ContractSignature extends JlinxDocument {
+  get contractId(){ return this.content?.contractId }
+  get identifierId(){ return this.content?.identifierId }
+}
 
 
 // import Path from 'path'

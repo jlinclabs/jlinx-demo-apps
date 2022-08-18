@@ -93,7 +93,7 @@ function Offer({ router }) {
 function OfferContractForm(){
   const navigate = useNavigate()
   const [contractUrl, setContractUrl] = useState('https://contracts.io/sisa-suyF9tPmVrtuuLn3R4XdzGXMZN6aFfCIXuXwGpAHtCw.md')
-  const [identifierDid, setIdentifierDid] = useState('')
+  const [identifierId, setIdentifierId] = useState('')
   const offerContract = useOfferContract({
     onSuccess(contract){
       navigate(`/contracts/${contract.id}`)
@@ -109,7 +109,7 @@ function OfferContractForm(){
       event.preventDefault()
       offerContract({
         contractUrl,
-        identifierDid,
+        identifierId,
       })
     }
   }}>
@@ -121,8 +121,8 @@ function OfferContractForm(){
     </Typography>
     <IdentifierSelectInput {...{
       autoFocus: true,
-      value: identifierDid,
-      onChange: e => { setIdentifierDid(e.target.value) },
+      value: identifierId,
+      onChange: e => { setIdentifierId(e.target.value) },
     }}/>
     <Typography variant="body1" sx={{my: 2}}>
       Which contract do you want to offer?
@@ -194,7 +194,7 @@ function LookupContractOfferingForm({ setId }){
 
 function SignContractOfferingForm({ contractId }){
   const [identifiers = []] = useMyIdentifiers()
-  const [identifierDid, setIdentifierDid] = useState('')
+  const [identifierId, setIdentifierId] = useState('')
   const [signatureId, setSignatureId] = useState('')
   const [contract, { loading }] = useContract(contractId)
   const signContract = useSignContract({
@@ -214,7 +214,7 @@ function SignContractOfferingForm({ contractId }){
       event.preventDefault()
       signContract({
         contractId,
-        identifierDid,
+        identifierId,
       })
     }
   }}>
@@ -252,8 +252,8 @@ function SignContractOfferingForm({ contractId }){
         </Typography>
         <IdentifierSelectInput {...{
           autoFocus: true,
-          value: identifierDid,
-          onChange: e => { setIdentifierDid(e.target.value) },
+          value: identifierId,
+          onChange: e => { setIdentifierId(e.target.value) },
         }}/>
         <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
           <Button type="submit" variant="contained">{`Sign Contract`}</Button>
@@ -277,7 +277,7 @@ function Contract({ contract }){
       <Typography variant="h4">
         {`Contract`}
       </Typography>
-      <LinkToCeramicApi host={contract.jlinxHost} id={contract.id}/>
+      <LinkToCeramicApi endpoint={contract.id}/>
     </Stack>
 
     {contract.contractUrl

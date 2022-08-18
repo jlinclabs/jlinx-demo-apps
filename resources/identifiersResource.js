@@ -7,6 +7,8 @@ const identifiers = {
   queries: {
     async getSecretSeed({ userId, did }){
       console.log('GET SECRET SEED', { userId, did })
+      if (!userId) throw new Error(`userId is required`)
+      if (!did) throw new Error(`did is required`)
       const record = await db.identifier.findUnique({
         where: {
           // userId,

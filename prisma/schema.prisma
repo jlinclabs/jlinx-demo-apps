@@ -27,11 +27,13 @@ model Session {
 }
 
 model Identifier {
-  id         String   @id
-  createdAt  DateTime @default(now())
+  id         String    @id
+  createdAt  DateTime  @default(now())
   secretSeed String
-  user       User     @relation(fields: [userId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
   userId     Int
+  Contract   Contract? @relation(fields: [contractId], references: [id])
+  contractId String?
 }
 
 model Profile {
@@ -42,8 +44,10 @@ model Profile {
 }
 
 model Contract {
-  id        String   @id
-  createdAt DateTime @default(now())
-  User      User?    @relation(fields: [userId], references: [id])
-  userId    Int?
+  id           String       @id
+  createdAt    DateTime     @default(now())
+  User         User         @relation(fields: [userId], references: [id])
+  userId       Int
+  Identifier   Identifier[]
+  identifierId String
 }
