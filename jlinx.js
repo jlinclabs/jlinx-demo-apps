@@ -42,14 +42,12 @@ export class JlinxClient {
   }
 
   async create(content, { metadata, ...opts } = {}){
+    if (!opts.asDID) opts.asDID = await this.getDid()
     const doc = await TileDocument.create(
       ceramic,
       content,
       metadata,
-      {
-        ...opts,
-        asDID: await this.getDid()
-      }
+      opts
     )
     return doc
   }
@@ -164,7 +162,7 @@ class JlinxContracts extends JlinxPlugin {
 
   async offerContract(opts = {}){
     const {
-      offerer = this.jlinxClient,
+      offerer = this.jlinxClient.did,
       contractUrl,
       signatureDropoffUrl
     } = opts
@@ -219,6 +217,7 @@ class Contract extends JlinxDocument {
   }
 
   async ackSignature(signature){
+    await this.sync()
     if (this.state !== 'offered'){
       throw new Error(`contract not in "offered" state.`)
     }

@@ -30,11 +30,12 @@ const contracts = {
       const contracts = await db.contract.findMany({
         where: { userId }
       })
+      // TODO: group by identifierId to improve performance
       await Promise.all(
         contracts.map(async contract => {
-          // new JlinxClient(userDid)
+          const jlinx = new JlinxClient(contract.userId, contract.identifierId)
           const jlinxContract = await jlinx.contracts.get(contract.id)
-          Object.assign(contract, jlinxContract.value)
+          Object.assign(contract, jlinxContract.content)
         })
       )
       return contracts
