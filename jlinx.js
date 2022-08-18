@@ -13,7 +13,6 @@ export class JlinxClient {
     debug('new JlinxClient', { userId, did })
     this.userId = userId
     this.did = did
-    // this.userId  = userId
     this.dids = new JlinxDids(this)
     this.profiles = new JlinxProfiles(this)
     this.contracts = new JlinxContracts(this)
@@ -61,6 +60,24 @@ class JlinxPlugin {
   }
 }
 
+class JlinxDocument {
+  constructor(jlinxClient, doc){
+    this.jlinxClient = jlinxClient
+    this.doc = doc // a ceramic tile stream
+  }
+  get id(){ return this.doc.id }
+  get content(){ return this.doc.content }
+  toJSON(){ return this.content }
+
+  async update(content, metadata, opts = {}) {
+    await this.doc.update(content, metadata, {
+      asDID: this.jlinxClient.did,
+      ...opts
+    })
+    await this.doc.sync()
+  }
+}
+
 class JlinxDids extends JlinxPlugin {
   async create(...opts){
     const { jlinxClient } = this
@@ -100,8 +117,11 @@ class Did {
 
 
 class JlinxProfiles extends JlinxPlugin {
-  async create(...opts){
-    const doc = await this.jlinxClient.create(...opts)
+  async create(content, opts = {}){
+    const doc = await this.jlinxClient.create(
+      content,
+      {...opts}, // TODO { schema }
+    )
     return new Profile(this, doc)
   }
   async get(...opts){
@@ -110,13 +130,10 @@ class JlinxProfiles extends JlinxPlugin {
   }
 }
 
-class Profile {
-  constructor(jlinxClient, doc){
-    this.jlinxClient = jlinxClient
-    this.doc = doc
-  }
+class Profile extends JlinxDocument {
+  get name(){ return this.content.name }
+  get avatar(){ return this.content.avatar }
 }
-
 
 
 class JlinxContracts extends JlinxPlugin {

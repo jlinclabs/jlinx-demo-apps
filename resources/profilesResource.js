@@ -8,6 +8,7 @@ const profiles = {
         where: { id },
         select: { userId: true, createdAt: true }
       })
+      const jlinx = new JlinxClient()
       const profile = await jlinx.profiles.get(id)
       return profileToJSON({ profile, record })
     },
@@ -16,6 +17,7 @@ const profiles = {
       const records = await db.profile.findMany({
         where: { userId }
       })
+      const jlinx = new JlinxClient()
       return await Promise.all(
         records.map(async record => {
           const profile = await jlinx.profiles.get(record.id)
@@ -27,24 +29,17 @@ const profiles = {
 
   commands: {
     async create({ userId, profile: value }){
-      const profile = await jlinx.profiles.create({
-        ...value,
-        // header: ({id}) => ({
-        //   serviceEndpoint: `${process.env.URL}/jlinx/profiles/${id}`
-        // })
-        serviceEndpoint: `${process.env.URL}/jlinx/profiles/:id`
-      })
-      // await profile.set(value)
-      console.log('profiles.create', profile, profile.value)
+      const did = value.did
+      const jlinx = new JlinxClient(userId, did)
+      const profile = await jlinx.profiles.create(value)
       const record = await db.profile.create({
-        data: { id: profile.id, userId },
+        data: { id: profile.id.toString(), userId },
         select: { userId: true, createdAt: true },
       })
       return profileToJSON({ profile, record })
     },
 
-    async update({ userId, profileId, changes }){
-
+    async update({ userId, did, profileId, changes }){
       const record = await db.profile.findUnique({
         where: { id: profileId },
         select: { userId: true, createdAt: true }
@@ -52,29 +47,27 @@ const profiles = {
       if (record.userId !== userId){
         throw new Error(`you are not authorized to change profile id=${profileId}`)
       }
+      const jlinx = new JlinxClient(userId, did)
       const profile = await jlinx.profiles.get(profileId)
-      await profile.set(changes)
+      await profile.update({...profile.content, ...changes})
       return profileToJSON({ profile, record })
     }
   },
 
   actions: {
     async create({ currentUser, profile }){
-      profile = await profiles.commands.create({
+      return await profiles.commands.create({
         userId: currentUser.id,
         profile,
       })
-      console.log('profiles.create', profile)
-      return profile
     },
-    async update({ currentUser, profileId, changes }){
-      const profile = await profiles.commands.update({
+    async update({ currentUser, did, profileId, changes }){
+      return await profiles.commands.update({
         userId: currentUser.id,
+        did,
         profileId,
         changes,
       })
-      console.log('profiles.update', profile)
-      return profile
     },
   },
 
@@ -93,16 +86,15 @@ const profiles = {
 export default profiles
 
 function profileToJSON({ profile, record }){
-  record = record || {}
-  const { id, state, ...meta } = profile.toJSON()
-  return {
-    ...state,
-    id,
-    meta: {
-      ...meta,
-      serviceEndpoint: profile.serviceEndpoint,
-    },
-    createdAt: record.createdAt,
-    userId: record.userId,
+  const data = {
+    ...profile.content,
+    id: profile.id.toString(),
+    isReadOnly: !!profile.isReadOnly,
   }
+  if (record) {
+    // data.id = record.id
+    data.createdAt = record.createdAt
+    data.userId = record.userId
+  }
+  return data
 }

@@ -2,6 +2,8 @@ import Debug from 'debug'
 import Path from 'path'
 import express from 'express'
 import Router from 'express-promise-router'
+// import * as IPFS from 'ipfs-core'
+// const ipfs = await IPFS.create()
 
 import ceramic, {
   TileDocument,
@@ -28,7 +30,6 @@ router.get('/api/ceramic/:streamId/meta', async (req, res) => {
   const doc = await TileDocument.load(ceramic, streamId)
   res.json({
     id: doc.id.toString(),
-
     // api: doc.api, // circular JSON
     content: doc.content,
     tip: doc.tip.toString(),
@@ -49,15 +50,12 @@ router.get('/api/ceramic/:streamId/meta', async (req, res) => {
 router.get('/api/ceramic/:streamId/events', async (req, res) => {
   const { streamId } = req.params
   const doc = await TileDocument.load(ceramic, streamId)
-  // const stream = await ceramic.loadStream(streamId)
 
   let closed = false
   let subscription
   req.on('close', function () {
     closed = true
-    console.log('EVENT STREAM CLOSED')
     if (subscription) subscription.unsubscribe()
-    // doc.complete()
   })
   res.set({
     'Cache-Control': 'no-cache',
@@ -81,7 +79,6 @@ router.get('/api/ceramic/:streamId/events', async (req, res) => {
       } catch (error) {
         json = `{"__JSON_ERROR__": "${error}"}`
       }
-      console.log('writing commit', { json })
       res.write(json)
       res.write('\n')
       cursor++
@@ -90,16 +87,13 @@ router.get('/api/ceramic/:streamId/events', async (req, res) => {
 
   await writeNewEvents()
 
-  console.log('LISTENING TO CHANGES ON', streamId)
   subscription = doc.subscribe((...args) => {
     if (closed) return
-    console.log('CHANGE ON', streamId)
     writeNewEvents().catch(error => {
       console.error(error)
       res.end()
     })
   })
-
 })
 
 export default router

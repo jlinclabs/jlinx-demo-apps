@@ -30,7 +30,7 @@ import Layout from '../Layout'
 import Link from '../components/Link'
 import ErrorMessage from '../components/ErrorMessage'
 import Timestamp from '../components/Timestamp'
-import LinkToJlinxHost from '../components/LinkToJlinxHost'
+import LinkToCeramicApi from '../components/LinkToCeramicApi'
 import Profile from '../components/Profile'
 
 import InspectObject from '../components/InspectObject'
@@ -194,10 +194,7 @@ function Identifier({ id, ...props }){
       >
         {`Identifier`}
       </Typography>
-      {/* <LinkToJlinxHost
-        host={identifier.header.host}
-        id={identifier.id}
-      /> */}
+      <LinkToCeramicApi endpoint={identifier.id} />
     </Stack>
     <Box>
       <Typography variant="h7">

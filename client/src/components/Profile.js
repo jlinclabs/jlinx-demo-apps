@@ -7,7 +7,7 @@ import Avatar from '@mui/material/Avatar'
 
 import { useProfile } from '../resources/profiles'
 import Link from '../components/Link'
-import LinkToJlinxHost from '../components/LinkToJlinxHost'
+import LinkToCeramicApi from '../components/LinkToCeramicApi'
 import ErrorMessage from '../components/ErrorMessage'
 
 export default function Profile({ id, ...props }){
@@ -30,10 +30,10 @@ export default function Profile({ id, ...props }){
       <Link to={`/profiles/${id}`}>
         <Typography variant="h4">{profile.name}</Typography>
       </Link>
-      <LinkToJlinxHost
+      {/* <LinkToCeramicApi
         host={profile.meta.header.host}
         id={profile.id}
-      />
+      /> */}
     </Stack>
   </Box>
 }

@@ -27,7 +27,7 @@ import {
 import { useMyIdentifiers } from '../resources/identifiers'
 import Layout from '../Layout'
 import Link from '../components/Link'
-import LinkToJlinxHost from '../components/LinkToJlinxHost'
+import LinkToCeramicApi from '../components/LinkToCeramicApi'
 import Timestamp from '../components/Timestamp'
 import ErrorMessage from '../components/ErrorMessage'
 import IdentifierProfile from '../components/IdentifierProfile'
@@ -223,10 +223,7 @@ function SignContractOfferingForm({ contractId }){
     </Typography>
 
     <Box>
-      <LinkToJlinxHost
-        host={contract.jlinxHost}
-        id={contract.id}
-      />
+      <LinkToCeramicApi endpoint={contract.id}/>
     </Box>
 
     <Typography paragraph>
@@ -280,7 +277,7 @@ function Contract({ contract }){
       <Typography variant="h4">
         {`Contract`}
       </Typography>
-      <LinkToJlinxHost host={contract.jlinxHost} id={contract.id}/>
+      <LinkToCeramicApi host={contract.jlinxHost} id={contract.id}/>
     </Stack>
 
     {contract.contractUrl

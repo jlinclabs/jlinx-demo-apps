@@ -6,6 +6,7 @@ import profiles from './profilesResource.js'
 const identifiers = {
   queries: {
     async getSecretSeed({ userId, did }){
+      console.log('GET SECRET SEED', { userId, did })
       const record = await db.identifier.findUnique({
         where: {
           // userId,
@@ -99,7 +100,6 @@ const identifiers = {
 export default identifiers
 
 async function getDidFromCeramic({ userId, id, record }){
-  console.log('getDidFromCeramic', { userId, id, record })
   let secretSeed
   if (record && record.userId === userId) {
     secretSeed = Buffer.from(record.secretSeed, 'hex')
@@ -109,7 +109,6 @@ async function getDidFromCeramic({ userId, id, record }){
 }
 
 function identifierToJSON({ userId, record, did }){
-  console.log('identifierToJSON', { record, did })
   let data
   if (record){
     data = data || {}

@@ -5,7 +5,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 
 import { useIdentifier } from '../resources/identifiers'
 import Link from './Link'
-import LinkToJlinxHost from '../components/LinkToJlinxHost'
+import LinkToCeramicApi from '../components/LinkToCeramicApi'
 import ErrorMessage from './ErrorMessage'
 import Profile from './Profile'
 
@@ -21,7 +21,7 @@ export default function IdentifierProfile({ identifierId, sx, ...props }){
       >
         {`identifier ${identifier.id}`}
       </Link>
-      <LinkToJlinxHost id={identifier.id} host={identifier.header.host}/>
+      <LinkToCeramicApi endpoint={identifier.id}/>
     </Typography>
     {identifier.profileId && <Profile id={identifier.profileId} />}
   </Box>

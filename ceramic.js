@@ -23,11 +23,6 @@ const app3id = await ThreeIdProvider.create({
   async getPermission(request){ return request.payload.paths },
 })
 
-console.log('APP app3id', app3id)
-console.log('APP app3id.keychain', app3id.keychain)
-console.log('APP app3id.keychain.status', app3id.keychain.status())
-console.log('APP app3id.keychain.list', await app3id.keychain.list())
-
 export async function createDid(){
   const secretSeed = Buffer.alloc(32)
   crypto.randomFillSync(secretSeed)

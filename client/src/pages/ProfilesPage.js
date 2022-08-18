@@ -15,6 +15,10 @@ import TextField from '@mui/material/TextField'
 import Avatar from '@mui/material/Avatar'
 import Paper from '@mui/material/Paper'
 import CircularProgress from '@mui/material/CircularProgress'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
 
 
 import useStateObject from '../lib/useStateObject'
@@ -25,12 +29,15 @@ import {
   useCreateProfile,
   useUpdateProfile,
 } from '../resources/profiles'
+import { useMyIdentifiers } from '../resources/identifiers'
 import Layout from '../Layout'
 import Link from '../components/Link'
 import ErrorMessage from '../components/ErrorMessage'
 import Timestamp from '../components/Timestamp'
 import Profile from '../components/Profile'
 import InspectObject from '../components/InspectObject'
+import LinkToCeramicApi from '../components/LinkToCeramicApi'
+import LinkToDid from '../components/LinkToDid'
 
 export default function ProfilesPage() {
   return <Layout title="Profiles" requireLoggedIn>
@@ -162,26 +169,52 @@ function New(){
 function Show(){
   const { id } = useParams()
   const [profile, { loading, error }] = useProfile(id)
-  const editable = profile && profile.meta.writable
-  return <Container maxWidth="sm">
+  const editable = profile && !profile.isReadOnly
+  return <Container maxWidth="md">
     <Paper
       elevation={3}
       sx={{ m: 3, p: 2 }}
     >
-      <Typography variant="h4" mb={2}>Profile</Typography>
-      <Profile id={id} />
-      {editable
-        ? <Stack
-          spacing={2}
-          direction="row-reverse"
-        >
-          <Button
-            variant="contained"
-            component={Link}
-            to={`/profiles/${id}/edit`}
-          >{`Edit Profile`}</Button>
-        </Stack>
-        : null
+      {loading
+        ? <CircularProgress/>
+        : <>
+          <Typography variant="h4" mb={2}>Profile</Typography>
+          <Stack
+            spacing={2}
+            direction="row"
+            alignItems="center"
+          >
+            <Link to={`/profiles/${id}`}>
+              <Avatar
+                alt={profile.name}
+                src={profile.avatar}
+                sx={{ width: 56, height: 56 }}
+              />
+            </Link>
+            <Link to={`/profiles/${id}`}>
+              <Typography variant="h4">{profile.name}</Typography>
+            </Link>
+            <LinkToCeramicApi endpoint={profile.id}/>
+          </Stack>
+
+          <Box my={3}>
+            <LinkToDid did={profile.did}/>
+          </Box>
+
+          {editable
+            ? <Stack
+              spacing={2}
+              direction="row-reverse"
+            >
+              <Button
+                variant="contained"
+                component={Link}
+                to={`/profiles/${id}/edit`}
+              >{`Edit Profile`}</Button>
+            </Stack>
+            : null
+          }
+        </>
       }
     </Paper>
 
@@ -189,10 +222,10 @@ function Show(){
       elevation={3}
       sx={{ m: 3, p: 2 }}
     >
-      <Typography variant="h6" mb={2}>JLINX Ledger Events</Typography>
-      {profile.meta.events.map((event, index) =>
+      <Typography variant="h6" mb={2}>Ceramic Stream Events</Typography>
+      {/* {profile.meta.events.map((event, index) =>
         <InspectObject key={index} object={event}/>
-      )}
+      )} */}
     </Paper>
     {/* <InspectObject object={profile.meta.events}/> */}
   </Container>
@@ -221,6 +254,7 @@ function Edit(){
   const onSubmit = () => {
     updateProfile({
       profileId,
+      did: profile.did,
       changes: value,
     })
   }
@@ -232,15 +266,15 @@ function Edit(){
     <Typography component="h1" variant="h3">
       Edit Profile
     </Typography>
-    <Typography component="h2" variant="h6">
+    <Typography component="h2" variant="h6" mb={2}>
       ID: {profileId}
     </Typography>
     {loading
       ? <CircularProgress/>
       : <ProfileForm {...{
         value: {
-          avatar: value.avatar || profile.avatar,
-          name: value.name || profile.name,
+          ...profile,
+          ...value,
         },
         onChange,
         submitText: (
@@ -255,8 +289,9 @@ function Edit(){
 }
 
 
-
 function ProfileForm(props){
+  const [myIdentifiers = [], myIdentifiersReq] = useMyIdentifiers()
+
   const uploadAvatar = useUploadFile({
     onSuccess(url){
       props.onChange({ avatar: url })
@@ -272,8 +307,7 @@ function ProfileForm(props){
     [uploadAvatar]
   )
 
-  console.log(JSON.stringify({ value: props.value }))
-
+  const editing = !!props.value.id
   const disabled = props.disabled || uploadAvatar.pending
   return <Box {...{
     disabled,
@@ -284,6 +318,36 @@ function ProfileForm(props){
     }
   }}>
 
+    {editing
+      ? <></>
+      : <Typography variant="body1" sx={{my: 2}}>
+        Which identifier do you want to associate this profile with?
+      </Typography>
+    }
+
+    <FormControl fullWidth>
+      <ErrorMessage error={myIdentifiersReq.error}/>
+      <InputLabel id="profileIdentifierLabel">Identifier</InputLabel>
+      <Select
+        name="did"
+        labelId="profileIdentifierLabel"
+        disabled={disabled || myIdentifiersReq.loading || editing}
+        autoFocus
+        value={props.value.did}
+        onChange={e => { props.onChange({ did: e.target.value }) }}
+      >
+        {myIdentifiers.map(identifier =>
+          <MenuItem
+            key={identifier.id}
+            value={identifier.id}
+          >
+            <Stack spacing={2} direction="row" alignItems="center">
+              <Typography component="span" variant="body1">{identifier.id}</Typography>
+            </Stack>
+          </MenuItem>
+        )}
+      </Select>
+    </FormControl>
     <Stack spacing={2} direction="row" alignItems="center" mt={2}>
       <Box sx={{ width: 56, height: 56 }}>
         {uploadAvatar.pending
