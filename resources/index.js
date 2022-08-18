@@ -1,4 +1,5 @@
 import pathToRegexp from 'path-to-regexp'
+import ceramic from './ceramicResource.js'
 import users from './usersResource.js'
 import session from './sessionResource.js'
 import profiles from './profilesResource.js'
@@ -7,6 +8,7 @@ import contracts from './contractsResource.js'
 import { NotFoundError } from '../errors.js'
 
 const resources = {
+  ceramic,
   users,
   session,
   profiles,

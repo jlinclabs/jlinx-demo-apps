@@ -38,6 +38,7 @@ import Profile from '../components/Profile'
 import InspectObject from '../components/InspectObject'
 import LinkToCeramicApi from '../components/LinkToCeramicApi'
 import LinkToDid from '../components/LinkToDid'
+import CeramicStreamEvents from '../components/CeramicStreamEvents'
 
 export default function ProfilesPage() {
   return <Layout title="Profiles" requireLoggedIn>
@@ -223,11 +224,8 @@ function Show(){
       sx={{ m: 3, p: 2 }}
     >
       <Typography variant="h6" mb={2}>Ceramic Stream Events</Typography>
-      {/* {profile.meta.events.map((event, index) =>
-        <InspectObject key={index} object={event}/>
-      )} */}
+      <CeramicStreamEvents id={id}/>
     </Paper>
-    {/* <InspectObject object={profile.meta.events}/> */}
   </Container>
 }
 

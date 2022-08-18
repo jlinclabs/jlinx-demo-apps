@@ -13,6 +13,7 @@ export class JlinxClient {
     debug('new JlinxClient', { userId, did })
     this.userId = userId
     this.did = did
+    this.readOnly = !!(this.userId && this.did)
     this.dids = new JlinxDids(this)
     this.profiles = new JlinxProfiles(this)
     this.contracts = new JlinxContracts(this)
@@ -71,10 +72,13 @@ class JlinxDocument {
 
   async update(content, metadata, opts = {}) {
     await this.doc.update(content, metadata, {
-      asDID: this.jlinxClient.did,
+      asDID: await this.jlinxClient.getDid(),
       ...opts
     })
-    await this.doc.sync()
+    await this.doc.sync({
+      // sync: SyncOptions.SYNC_ALWAYS // TODO
+    })
+    // TODO consider this.doc.requestAnchor()
   }
 }
 
@@ -122,11 +126,11 @@ class JlinxProfiles extends JlinxPlugin {
       content,
       {...opts}, // TODO { schema }
     )
-    return new Profile(this, doc)
+    return new Profile(this.jlinxClient, doc)
   }
   async get(...opts){
     const doc = await this.jlinxClient.get(...opts)
-    return new Profile(this, doc)
+    return new Profile(this.jlinxClient, doc)
   }
 }
 
@@ -140,11 +144,11 @@ class JlinxContracts extends JlinxPlugin {
   async create(...opts){
     console.log('JlinxContracts.create', this, opts)
     const doc = await this.jlinxClient.create(...opts)
-    return new Contract(this, doc)
+    return new Contract(this.jlinxClient, doc)
   }
   async get(...opts){
     const doc = await this.jlinxClient.get(...opts)
-    return new Contract(this, doc)
+    return new Contract(this.jlinxClient, doc)
   }
 }
 
