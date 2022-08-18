@@ -27,22 +27,37 @@ router.get('/api/ceramic/:streamId/meta', async (req, res) => {
   const { streamId } = req.params
   const doc = await TileDocument.load(ceramic, streamId)
   res.json({
-    id: doc.id,
-    // api: doc.api,
+    id: doc.id.toString(),
+
+    // api: doc.api, // circular JSON
     content: doc.content,
-    tip: doc.tip,
-    commitId: doc.commitId,
-    allCommitIds: doc.allCommitIds,
-    anchorCommitIds: doc.anchorCommitIds,
-    state: doc.state,
+    tip: doc.tip.toString(),
+    commitId: doc.commitId.toString(),
+    allCommitIds: doc.allCommitIds.map(id => id.toString()),
+    anchorCommitIds: doc.anchorCommitIds.map(id => id.toString()),
+    state: {
+      ...doc.state,
+      log: doc.state.log.map(entry => ({...entry, cid: entry.cid.toString()}))
+      // anchorProof: doc.state.anchorProof
+    },
+    metadata: doc.metadata,
+    controllers: doc.controllers,
+    isReadOnly: doc.isReadOnly,
   })
 })
 
-router.get('/api/ceramic/:streamId/stream', async (req, res) => {
+router.get('/api/ceramic/:streamId/events', async (req, res) => {
+  const { streamId } = req.params
+  const doc = await TileDocument.load(ceramic, streamId)
+  // const stream = await ceramic.loadStream(streamId)
+
   let closed = false
+  let subscription
   req.on('close', function () {
     closed = true
-    // doc.close()
+    console.log('EVENT STREAM CLOSED')
+    if (subscription) subscription.unsubscribe()
+    // doc.complete()
   })
   res.set({
     'Cache-Control': 'no-cache',
@@ -51,25 +66,39 @@ router.get('/api/ceramic/:streamId/stream', async (req, res) => {
   })
 
   res.flushHeaders()
-  // await doc.update()
 
   let cursor = 0
-  while (true) {
-    if (closed) break
-    while (cursor < doc.length) {
-      if (closed) break
-      let entry = await doc.get(cursor)
-      debug('STREAM', { i: cursor, entry })
+  async function writeNewEvents(){
+    if (closed) return
+    await doc.sync()
+    const commitIds = [...doc.allCommitIds].slice(cursor)
+    while (commitIds.length > 0){
+      const commitId = commitIds.shift()
+      const stream = await ceramic.loadStream(commitId)
+      let json
       try {
-        entry = JSON.stringify(JSON.parse(entry), null, 2)
-      } catch (e) {}
-      res.write(entry)
+        json = JSON.stringify(stream.content, null, 2)
+      } catch (error) {
+        json = `{"__JSON_ERROR__": "${error}"}`
+      }
+      console.log('writing commit', { json })
+      res.write(json)
       res.write('\n')
       cursor++
     }
-    if (closed) break
-    await doc.waitForUpdate(cursor)
   }
+
+  await writeNewEvents()
+
+  console.log('LISTENING TO CHANGES ON', streamId)
+  subscription = doc.subscribe((...args) => {
+    if (closed) return
+    console.log('CHANGE ON', streamId)
+    writeNewEvents().catch(error => {
+      console.error(error)
+      res.end()
+    })
+  })
 
 })
 
