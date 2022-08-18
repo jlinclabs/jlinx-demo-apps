@@ -5,6 +5,22 @@ import profiles from './profilesResource.js'
 
 const identifiers = {
   queries: {
+    async getSecretSeed({ userId, did }){
+      const record = await db.identifier.findUnique({
+        where: {
+          // userId,
+          id: did,
+        },
+        select: {
+          userId: true,
+          secretSeed: true,
+        }
+      })
+      if (record && record.userId === userId) {
+        return Buffer.from(record.secretSeed, 'hex')
+      }
+    },
+
     async byId({ id, userId }){
       const record = await db.identifier.findUnique({
         where: { id },

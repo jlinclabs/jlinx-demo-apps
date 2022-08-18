@@ -28,6 +28,7 @@ const contracts = {
       })
       await Promise.all(
         contracts.map(async contract => {
+          // new JlinxClient(userDid)
           const jlinxContract = await jlinx.contracts.get(contract.id)
           Object.assign(contract, jlinxContract.value)
         })
@@ -43,7 +44,11 @@ const contracts = {
         contractUrl,
         userId,
       } = options
+
       // TODO ensure identifierDid exists and is ours
+      const jlinx = new JlinxClient(userId, identifierDid)
+      console.log('jlinx client', jlinx)
+      console.log('jlinx client did', await jlinx.getDid())
       const contract = await jlinx.contracts.create()
       await contract.offerContract({
         offerer: identifierDid,

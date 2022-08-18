@@ -3,16 +3,32 @@ import crypto from 'crypto'
 import { randomBytes } from '@stablelib/random'
 import ceramic, { TileDocument, createDid, getDid, resolveDidDocument } from './ceramic.js'
 
+import identifiersResource from './resources/identifiersResource.js'
+
 const debug = Debug('jlinx')
 
 export class JlinxClient {
 
-  constructor(did){
-    debug('new JlinxClient', { did })
+  constructor(userId, did){
+    debug('new JlinxClient', { userId, did })
+    this.userId = userId
     this.did = did
     // this.userId  = userId
     this.dids = new JlinxDids(this)
     this.profiles = new JlinxProfiles(this)
+    this.contracts = new JlinxContracts(this)
+  }
+
+  async getDid(){
+    if (this._did) return this._did
+    const { userId, did } = this
+    // go get the private key from the db
+    const secretSeed = await identifiersResource.queries.getSecretSeed({ userId, did })
+    if (!secretSeed){
+      throw new Error(`unable to get secretSeed for userId="${userId}" did="${did}"`)
+    }
+    this._did = await getDid(did, secretSeed)
+    return this._did
   }
 
   async get(id, opts = {}){
@@ -32,7 +48,7 @@ export class JlinxClient {
       metadata,
       {
         ...opts,
-        asDID: this.did
+        asDID: await this.getDid()
       }
     )
     return doc
@@ -85,7 +101,7 @@ class Did {
 
 class JlinxProfiles extends JlinxPlugin {
   async create(...opts){
-    const doc = await this.jlinxClient(...opts)
+    const doc = await this.jlinxClient.create(...opts)
     return new Profile(this, doc)
   }
   async get(...opts){
@@ -98,6 +114,37 @@ class Profile {
   constructor(jlinxClient, doc){
     this.jlinxClient = jlinxClient
     this.doc = doc
+  }
+}
+
+
+
+class JlinxContracts extends JlinxPlugin {
+  async create(...opts){
+    console.log('JlinxContracts.create', this, opts)
+    const doc = await this.jlinxClient.create(...opts)
+    return new Contract(this, doc)
+  }
+  async get(...opts){
+    const doc = await this.jlinxClient.get(...opts)
+    return new Contract(this, doc)
+  }
+}
+
+class Contract {
+  constructor(jlinxClient, doc){
+    this.jlinxClient = jlinxClient
+    this.doc = doc
+  }
+
+  offerContract(opts = {}){
+    console.log('Offer Contract', this, this.doc)
+    const {
+      offerer,
+      contractUrl,
+      signatureDropoffUrl
+    } = opts
+
   }
 }
 
