@@ -1,9 +1,5 @@
 import Debug from 'debug'
-import Path from 'path'
-import express from 'express'
 import Router from 'express-promise-router'
-// import * as IPFS from 'ipfs-core'
-// const ipfs = await IPFS.create()
 
 import ceramic, {
   TileDocument,
@@ -65,13 +61,32 @@ router.get('/api/ceramic/:streamId/events', async (req, res) => {
 
   res.flushHeaders()
 
+  let lookingForNewEvents = false
+  async function lookForNewEvents(){
+    if (closed) return
+    if (lookingForNewEvents) {
+      await lookingForNewEvents
+      await lookForNewEvents()
+    }else{
+      lookingForNewEvents = writeNewEvents().catch(error => {
+        closed = true
+        console.error(error)
+        res.end()
+      })
+      await lookingForNewEvents
+      lookingForNewEvents = null
+    }
+  }
+
   let cursor = 0
   async function writeNewEvents(){
     if (closed) return
-    await doc.sync()
-    const commitIds = [...doc.allCommitIds].slice(cursor)
-    while (commitIds.length > 0){
-      const commitId = commitIds.shift()
+    const allCommitIds = [...doc.allCommitIds]
+    const newCommits = allCommitIds.slice(cursor)
+    if (newCommits.length === 0) return
+    cursor = allCommitIds.length
+    while (newCommits.length > 0){
+      const commitId = newCommits.shift()
       const stream = await ceramic.loadStream(commitId)
       let json
       try {
@@ -81,19 +96,10 @@ router.get('/api/ceramic/:streamId/events', async (req, res) => {
       }
       res.write(json)
       res.write('\n')
-      cursor++
     }
   }
 
-  await writeNewEvents()
-
-  subscription = doc.subscribe((...args) => {
-    if (closed) return
-    writeNewEvents().catch(error => {
-      console.error(error)
-      res.end()
-    })
-  })
+  subscription = doc.subscribe(lookForNewEvents)
 })
 
 export default router
