@@ -26,6 +26,7 @@
     "express": "^4.18.1",
     "express-promise-router": "^4.1.1",
     "gun-avatar": "^1.6.2",
+    "ipfs-core": "^0.15.4",
     "key-did-provider-ed25519": "^2.0.1",
     "key-did-resolver": "^2.0.6",
     "multer": "^1.4.5-lts.1",
