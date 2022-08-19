@@ -291,13 +291,13 @@ function Contract({ contract }){
       <Typography variant="h4">
         {`Contract`}
       </Typography>
-      <LinkToCeramicApi endpoint={contract.id}/>
     </Stack>
 
 
     <Box my={2}>
       <Typography variant="h6">ID</Typography>
-      <LinkToCeramicApi endpoint={contract.id}>{contract.id}</LinkToCeramicApi>
+      <Link to={`/contracts/${contract.id}`}>{contract.id}</Link>
+      <LinkToCeramicApi endpoint={contract.id}/>
     </Box>
 
     {contract.contractUrl
