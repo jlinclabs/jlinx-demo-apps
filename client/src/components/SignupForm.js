@@ -86,7 +86,7 @@ export default function SignupForm(props){
         </Button>
       </Stack>
       <Typography variant="body2">
-        To make it easier to signup for this demo we allow you to use a massive secret key.
+        To make it easier to signup for this demo we allow you to use a secret key.
         <br/>
         <b>You need this to login</b>
         <br/>
@@ -100,7 +100,7 @@ export default function SignupForm(props){
             value={secretKeyIsValid && agreed}
             onChange={e => { setAgreed(!!e.target.checked) }}
           />}
-          label="I have coppied and stored my SecretKey"
+          label="I have copied and stored my SecretKey"
         />
       </Box>
 
