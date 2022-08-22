@@ -25,3 +25,15 @@ sudo chgrp -hR www-data jlinx.vault/
 ./scripts/db-migrate
 npm run build
 ```
+
+
+
+
+## Create postgresql database for app
+
+```
+CREATE DATABASE blog_hog;
+REVOKE ALL ON DATABASE blog_hog FROM public;
+CREATE USER blog_hog WITH PASSWORD 'passwordbird';
+GRANT CONNECT ON DATABASE blog_hog TO blog_hog;
+```
