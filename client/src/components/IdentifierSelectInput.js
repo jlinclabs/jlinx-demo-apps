@@ -1,21 +1,16 @@
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
-import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
-import Button from '@mui/material/Button'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
-import Avatar from '@mui/material/Avatar'
 
 import { useMyProfiles } from '../resources/profiles'
 import { useMyIdentifiers } from '../resources/identifiers'
-import Link from './Link'
 import ErrorMessage from './ErrorMessage'
-import Profile from './Profile'
 
-export default function IdentifierProfile({
+export default function IdentifierSelectInput({
   value, onChange, disabled = false, ...props
 }){
   const [identifiers, identifiersReq] = useMyIdentifiers()
@@ -42,15 +37,7 @@ export default function IdentifierProfile({
         console.log({ identifier, profile })
         return <MenuItem key={identifier.id} value={identifier.id}>
           <Stack spacing={2} direction="row" alignItems="center">
-            <Avatar
-              alt={profile.name}
-              src={profile.avatar}
-              sx={{ width: 56, height: 56 }}
-            />
-            <Stack spacing={0} direction="column">
-              <Typography component="span" variant="body1">{profile.name}</Typography>
-              <Typography component="span" variant="body2">{identifier.id}</Typography>
-            </Stack>
+            <Typography component="span" variant="body2">{identifier.id}</Typography>
           </Stack>
         </MenuItem>
       })}

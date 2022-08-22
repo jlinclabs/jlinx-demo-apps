@@ -193,7 +193,6 @@ function LookupContractOfferingForm({ setId }){
 
 
 function SignContractOfferingForm({ contractId }){
-  const [identifiers = []] = useMyIdentifiers()
   const [identifierId, setIdentifierId] = useState('')
   const [signatureId, setSignatureId] = useState('')
   const [contract, { loading }] = useContract(contractId)

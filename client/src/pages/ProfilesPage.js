@@ -1,5 +1,5 @@
 import { Routes, Route, useNavigate, useParams } from 'react-router-dom'
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
@@ -15,10 +15,6 @@ import TextField from '@mui/material/TextField'
 import Avatar from '@mui/material/Avatar'
 import Paper from '@mui/material/Paper'
 import CircularProgress from '@mui/material/CircularProgress'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
 
 
 import useStateObject from '../lib/useStateObject'
@@ -39,6 +35,7 @@ import InspectObject from '../components/InspectObject'
 import LinkToCeramicApi from '../components/LinkToCeramicApi'
 import LinkToDid from '../components/LinkToDid'
 import CeramicStreamEvents from '../components/CeramicStreamEvents'
+import IdentifierSelectInput from '../components/IdentifierSelectInput'
 
 export default function ProfilesPage() {
   return <Layout title="Profiles" requireLoggedIn>
@@ -323,7 +320,11 @@ function ProfileForm(props){
       </Typography>
     }
 
-    <FormControl fullWidth>
+    <IdentifierSelectInput
+      value={props.value.did}
+      onChange={e => { props.onChange({ did: e.target.value }) }}
+    />
+    {/* <FormControl fullWidth>
       <ErrorMessage error={myIdentifiersReq.error}/>
       <InputLabel id="profileIdentifierLabel">Identifier</InputLabel>
       <Select
@@ -345,7 +346,7 @@ function ProfileForm(props){
           </MenuItem>
         )}
       </Select>
-    </FormControl>
+    </FormControl> */}
     <Stack spacing={2} direction="row" alignItems="center" mt={2}>
       <Box sx={{ width: 56, height: 56 }}>
         {uploadAvatar.pending
