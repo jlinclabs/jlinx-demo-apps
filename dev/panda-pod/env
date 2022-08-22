@@ -1,0 +1,10 @@
+REACT_APP_NAME=PandaPod
+REACT_APP_COLOR="#1d1f20"
+PORT=4585
+HOST=panda-pod.jlinx.test
+URL=https://panda-pod.jlinx.test:4583
+UPLOADS_PATH=/Volumes/Work/jlinc/jlinx/demo-apps/dev/panda-pod/uploads
+SESSION_SECRET=bkWLc54bbVdhi8fOv3fNeGzHbiFRcKg3xqryxNEtfDz
+DATABASE_URL=postgresql://deadlyicon@localhost/jlinx-demo-panda-pod
+CERAMIC_API_URL=http://0.0.0.0:7007
+CERAMIC_NODE_SECRET=50b1c52dab3e794a635db52671319f937ab5d50fdecd80290667850278930937
