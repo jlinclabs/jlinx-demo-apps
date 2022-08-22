@@ -1,0 +1,10 @@
+REACT_APP_NAME=HobitHub
+REACT_APP_COLOR="#ffd700"
+PORT=4583
+HOST=hobit-hub.jlinx.test
+URL=https://hobit-hub.jlinx.test:4583
+UPLOADS_PATH=/Volumes/Work/jlinc/jlinx/demo-apps/dev/hobit-hub/uploads
+SESSION_SECRET=bkWLc54bbVdhi8fOv3fNeGzHbiFRcKg3xqryxNEtfDz
+DATABASE_URL=postgresql://deadlyicon@localhost/jlinx-demo-hobit-hub
+CERAMIC_API_URL=http://0.0.0.0:7007
+CERAMIC_NODE_SECRET=50b1c52dab3e794a635db52671319f937ab5d50fdecd80290667850278930937
