@@ -86,7 +86,7 @@ export default function SignupForm(props){
         </Button>
       </Stack>
       <Typography variant="body2">
-        To make it easier to signup for this demo we allow you to use a massic secret key.
+        To make it easier to signup for this demo we allow you to use a massive secret key.
         <br/>
         <b>You need this to login</b>
         <br/>
