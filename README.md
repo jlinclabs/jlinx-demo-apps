@@ -31,9 +31,29 @@ npm run build
 
 ## Create postgresql database for app
 
+```bash
+git init
+git remote add origin git@github.com:jlinclabs/jlinx-demo-apps.git
+git fetch
+git checkout create-react-app
+npm i && (cd client/ && npm i)
+
+mkdir uploads
+sudo chgrp -hR www-data uploads
+
+vi .env
+npm run build
+sudo -u postgres psql
 ```
-CREATE DATABASE blog_hog;
-REVOKE ALL ON DATABASE blog_hog FROM public;
-CREATE USER blog_hog WITH PASSWORD 'passwordbird';
-GRANT CONNECT ON DATABASE blog_hog TO blog_hog;
+
+```sql
+CREATE DATABASE panda_pod;
+REVOKE ALL ON DATABASE panda_pod FROM public;
+CREATE USER panda_pod WITH PASSWORD 'passwordbird';
+GRANT CONNECT ON DATABASE panda_pod TO panda_pod;
+```
+
+```bash
+npx prisma db push
+sudo vi /etc/nginx/sites-available/hobit-hub
 ```
