@@ -20,8 +20,8 @@ const sessionResource = {
             select: {
               id: true,
               // did: true,
-              secretKey: false, // !
-              // email: true,
+              // secretKey: false, // !
+              email: true,
               // name: true,
               createdAt: true,
             }
@@ -57,20 +57,20 @@ const sessionResource = {
 
   actions: {
 
-    async signup({ session, secretKey }){
-      console.log('signup', { session, secretKey })
+    async signup({ session, email }){
+      console.log('signup', { session, email })
       if (session.userId){
         throw new Error(`please logout first`)
       }
-      const user = await users.commands.create({ secretKey })
+      const user = await users.commands.create({ email })
       const userId = user.id
       await identifiers.commands.create({ userId })
       await session.setUserId(userId)
       // await session.save();
     },
 
-    async login({ session, secretKey }){
-      const user = await users.queries.findBySecretKey(secretKey)
+    async login({ session, email }){
+      const user = await users.queries.findByEmail(email)
       // const match = await bcrypt.compare(password, user.passwordHash)
       if (!user){ throw new Error(`invalid email or password`)}
       await session.setUserId(user.id)

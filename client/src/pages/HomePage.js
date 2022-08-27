@@ -17,7 +17,7 @@ export default function HomePage() {
       {currentUser
         ? <>
           <Typography variant="h4">
-            Welcome back user #{currentUser.id}
+            Welcome back user {currentUser.email}
           </Typography>
         </>
         : <Stack>

@@ -2,33 +2,27 @@ import prisma from '../prisma/client.js'
 
 const users = {
   queries: {
-    async findBySecretKey(secretKey){
+    async findByEmail(email){
       return await prisma.user.findUnique({
-        where: { secretKey },
+        where: { email },
         select: {
           id: true,
           createdAt: true,
-          secretKey: false //!
         }
       })
     }
   },
 
   commands: {
-    async create({ secretKey }){
+    async create({ email }){
       return await prisma.user.create({
-        data: { secretKey }
+        data: { email }
       })
     }
   },
 
   actions: {
-    signup(){
 
-    },
-    login(){
-
-    },
   },
 
   views: {
