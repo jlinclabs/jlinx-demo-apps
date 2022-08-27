@@ -217,7 +217,7 @@ function Identifier({ id, ...props }){
       }
     </Box> */}
 
-    {editable
+    {/* {editable
       ? <Stack
         spacing={2}
         direction="row-reverse"
@@ -229,7 +229,7 @@ function Identifier({ id, ...props }){
         >{`Edit Identifier`}</Button>
       </Stack>
       : null
-    }
+    } */}
 
     <Box>
       <Typography variant="h7">DID Document</Typography>
