@@ -1,5 +1,5 @@
 REACT_APP_NAME=PandaPod
-REACT_APP_COLOR="#1d1f20"
+REACT_APP_COLOR="#555555"
 PORT=4585
 HOST=panda-pod.jlinx.test
 URL=https://panda-pod.jlinx.test:4583
