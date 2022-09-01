@@ -6,7 +6,8 @@ import HomePage from './pages/HomePage'
 import LogoutPage from './pages/LogoutPage'
 import ProfilesPage from './pages/ProfilesPage'
 import IdentifiersPage from './pages/IdentifiersPage'
-import ContractsIndexPage from './pages/ContractsPage'
+import ContractsPage from './pages/ContractsPage'
+import SisasPage from './pages/SisasPage'
 
 export default function Routes() {
   return <_Routes>
@@ -16,6 +17,7 @@ export default function Routes() {
     <Route path="/logout" element={<LogoutPage />} />
     <Route path="/profiles/*" element={<ProfilesPage />} />
     <Route path="/identifiers/*" element={<IdentifiersPage />} />
-    <Route path="/contracts/*" element={<ContractsIndexPage />} />
+    <Route path="/contracts/*" element={<ContractsPage />} />
+    <Route path="/sisas/*" element={<SisasPage />} />
   </_Routes>
 }

@@ -68,6 +68,16 @@ router.post('/api/jlinx/contracts/signatures', async (req, res) => {
   res.json(result)
 })
 
+router.post('/api/jlinx/sisas/signatures', async (req, res) => {
+  const { sisaId, signatureId } = req.body
+  const result = await takeAction({
+    actionId: 'sisas.ackSignature',
+    session: req.session,
+    options: { sisaId, signatureId },
+  })
+  res.json(result)
+})
+
 router.use((error, req, res, next) => {
   console.error('ERROR', error)
   res.status(error.statusCode || 500).json({

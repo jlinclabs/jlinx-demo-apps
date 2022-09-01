@@ -14,6 +14,7 @@ import AccountBoxOutlinedIcon from '@mui/icons-material/AccountBoxOutlined'
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined'
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined'
 import HomeIcon from '@mui/icons-material/Home'
+import DescriptionIcon from '@mui/icons-material/Description'
 
 import { useCurrentUser } from './resources/session'
 import Link from './components/Link'
@@ -82,6 +83,11 @@ function SideNav({ loading, currentUser }) {
         icon: <ArticleOutlinedIcon/>,
         text: 'Contracts',
         to: '/contracts',
+      }}/>
+      <NavButton {...{
+        icon: <DescriptionIcon/>,
+        text: 'SISAs',
+        to: '/sisas',
       }}/>
       <Box sx={{ flex: '1 1'}}/>
       <Divider />

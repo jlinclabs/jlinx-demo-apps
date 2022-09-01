@@ -17,6 +17,7 @@ model User {
   identifiers Identifier[]
   profiles    Profile[]
   contracts   Contract[]
+  sisas       Sisa[]
 }
 
 model Session {
@@ -35,6 +36,8 @@ model Identifier {
   userId     Int
   Contract   Contract? @relation(fields: [contractId], references: [id])
   contractId String?
+  Sisa       Sisa?     @relation(fields: [sisaId], references: [id])
+  sisaId     String?
 }
 
 model Profile {
@@ -45,6 +48,15 @@ model Profile {
 }
 
 model Contract {
+  id           String       @id
+  createdAt    DateTime     @default(now())
+  User         User         @relation(fields: [userId], references: [id])
+  userId       Int
+  Identifier   Identifier[]
+  identifierId String
+}
+
+model Sisa {
   id           String       @id
   createdAt    DateTime     @default(now())
   User         User         @relation(fields: [userId], references: [id])

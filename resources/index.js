@@ -5,6 +5,7 @@ import session from './sessionResource.js'
 import profiles from './profilesResource.js'
 import identifiers from './identifiersResource.js'
 import contracts from './contractsResource.js'
+import sisas from './sisasResource.js'
 import { NotFoundError } from '../errors.js'
 
 const resources = {
@@ -14,6 +15,7 @@ const resources = {
   profiles,
   identifiers,
   contracts,
+  sisas,
 }
 
 export async function getView({ viewId, session }) {

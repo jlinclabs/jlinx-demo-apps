@@ -17,6 +17,7 @@ export class JlinxClient {
     this.dids = new JlinxDids(this)
     this.profiles = new JlinxProfiles(this)
     this.contracts = new JlinxContracts(this)
+    this.sisas = new JlinxSisas(this)
   }
 
   async getDid(){
@@ -196,6 +197,7 @@ class Contract extends JlinxDocument {
       signatureDropoffUrl
     } = opts
     await this.patch({
+      "@context": "https://schemas.jlinx.io/contract-v0.json",
       state: 'offered',
       offerer,
       contractUrl,
@@ -244,32 +246,110 @@ class ContractSignature extends JlinxDocument {
 }
 
 
-// import Path from 'path'
-// import b4a from 'b4a'
-// import JlinxClient from 'jlinx-client'
-// import JlinxIdentifiers from 'jlinx-client/Identifiers.js'
-// import JlinxProfiles from 'jlinx-client/Profiles.js'
-// import JlinxContracts from 'jlinx-client/Contracts.js'
-// import exitHook from 'exit-hook'
 
-// const {
-//   JLINX_HOST,
-//   JLINX_VAULT_PATH,
-//   JLINX_VAULT_KEY,
-// } = process.env
 
-// const jlinx = new JlinxClient({
-//   hostUrl: JLINX_HOST,
-//   vaultPath: JLINX_VAULT_PATH,
-//   vaultKey: b4a.from(JLINX_VAULT_KEY, 'hex')
-// })
 
-// jlinx.identifiers = new JlinxIdentifiers(jlinx)
-// jlinx.profiles = new JlinxProfiles(jlinx)
-// jlinx.contracts = new JlinxContracts(jlinx)
 
-// console.log({jlinx})
 
-// export default jlinx
 
-// exitHook(() => { jlinx.destroy() });
+
+// SISAS
+
+
+
+class JlinxSisas extends JlinxPlugin {
+  async create(...opts){
+    console.log('JlinxSisas.create', this, opts)
+    const doc = await this.jlinxClient.create(...opts)
+    return new Sisa(this.jlinxClient, doc)
+  }
+
+  async get(...opts){
+    const doc = await this.jlinxClient.get(...opts)
+    return new Sisa(this.jlinxClient, doc)
+  }
+
+  async offerSisa(opts = {}){
+    const {
+      offerer = this.jlinxClient.did,
+      requestedDataFields,
+      signatureDropoffUrl,
+    } = opts
+    return this.create({
+      state: 'offered',
+      offerer,
+      requestedDataFields,
+      signatureDropoffUrl,
+    })
+  }
+
+  async getSignature(...opts){
+    const doc = await this.jlinxClient.get(...opts)
+    return new SisaSignature(this.jlinxClient, doc)
+  }
+}
+
+
+class Sisa extends JlinxDocument {
+
+  get state(){ return this.content?.state }
+  get offerer(){ return this.content?.offerer }
+  // get contractUrl(){ return this.content?.contractUrl }
+  get signatureDropoffUrl(){ return this.content?.signatureDropoffUrl }
+  get signatureId(){ return this.content?.signatureId }
+
+  async offerSisa(opts = {}){
+    console.log('Offer Sisa', this, this.doc)
+    const {
+      offerer,
+      signatureDropoffUrl,
+      requestedDataFields,
+    } = opts
+    await this.patch({
+      "@context": "https://schemas.jlinx.io/sisa-v0.json",
+      state: 'offered',
+      offerer,
+      signatureDropoffUrl,
+      requestedDataFields,
+    })
+  }
+
+  async sign(){
+    const signature = await this.jlinxClient.create({
+      contractId: this.id.toString(),
+      identifierId: this.jlinxClient.did,
+    })
+    console.log('CREATED SIGNATURE', {
+      signature,
+      'signature.content': signature.content,
+      'signature.controllers': signature.controllers,
+    })
+    return signature
+  }
+
+  async ackSignature(signature){
+    await this.sync()
+    if (this.state !== 'offered'){
+      throw new Error(`contract not in "offered" state.`)
+    }
+    await signature.sync()
+    if (signature.content.contractId !== this.id.toString()){
+      throw new Error(`signature.contractId does not match contract.id`)
+    }
+    const signer = signature.controllers[0]
+    if (!signer){
+      throw new Error(`signature has no controllers`)
+    }
+    await this.patch({
+      state: 'signed',
+      signatureDropoffUrl: undefined,
+      signatureId: signature.id.toString(),
+      signer,
+    })
+  }
+}
+
+class SisaSignature extends JlinxDocument {
+  get contractId(){ return this.content?.contractId }
+  get identifierId(){ return this.content?.identifierId }
+}
