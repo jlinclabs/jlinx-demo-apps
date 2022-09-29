@@ -3,6 +3,7 @@
 set -e
 set -x
 
+APP_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && cd .. && pwd)
 APP_PATH=$1
 
 # if no app path exists
@@ -49,6 +50,15 @@ fi
 
 PORT=$(dotenv -e ${APP_PATH}/.env -p PORT)
 echo PORT=${PORT}
+
+cat > "${APP_ROOT}/.proxyrc" <<-EOF
+{
+  "/api": {
+    "target": "${SERVER_URL}"
+  }
+}
+EOF
+
 
 npx parcel serve \
   --port ${PORT} \
