@@ -1,0 +1,11 @@
+{
+  "name": "shoplist",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+
+  },
+  "dependencies": {
+    "jlinx-web-server": "file:../../packages/jlinx-demo-app"
+  }
+}
