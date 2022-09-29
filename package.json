@@ -57,6 +57,7 @@
     "multiformats": "^9.8.1",
     "node-fetch": "^3.2.10",
     "node-jose": "^2.1.1",
+    "parcel": "^2.7.0",
     "prisma": "^4.3.1",
     "standard": "^17.0.0",
     "tmp-promise": "^3.0.3",

@@ -7,8 +7,9 @@ import proxy from 'express-http-proxy'
 export async function createDemoApp(options = {}){
   const app = express()
 
-  app.start = function(){
-    app.server = app.listen(options.port, () => {
+  app.start = function(opts = {}){
+    const { host, port } = opts
+    app.server = app.listen(port, () => {
       const { port } = app.server.address()
       const host = `http://localhost:${port}`
       console.log(`Listening on port ${host}`)
@@ -28,6 +29,9 @@ export async function createDemoApp(options = {}){
   app.Router = Router
   app.routes = new Router()
   app.use(app.routes)
+  app.get('/api/status', (req, res) => {
+    res.json({ status: 'ok' })
+  })
 
   if (process.env.NODE_ENV === 'production') {
     const buildPath = Path.join(process.env.APP_ROOT, 'client/build')

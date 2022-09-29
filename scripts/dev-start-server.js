@@ -3,4 +3,7 @@
 const APP_PATH = process.argv[2]
 const path = `../${APP_PATH}server/index.js`
 const { default: server } = await import(path)
-await server.start()
+await server.start({
+  port: process.env.PORT,
+  host: process.env.HOST,
+})

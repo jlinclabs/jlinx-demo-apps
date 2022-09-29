@@ -24,7 +24,8 @@ fi
 # cd $APP_PATH
 # pwd
 
-SERVER_PORT=$(node "$APP_ROOT/scripts/find-open-port.js")
+# SERVER_PORT=$(node "$APP_ROOT/scripts/find-open-port.js")
+SERVER_PORT=3085
 API_SERVER="http://localhost:${SERVER_PORT}"
 
 exec dotenv -e .env -- concurrently \
