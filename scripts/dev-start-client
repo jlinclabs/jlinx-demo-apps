@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -e
+set -x
+
+APP_PATH=$1
+# cd "${APP_PATH}/client"
+
+export SERVER=true
+export HTTPS=false
+export BROWSER=none
+export DANGEROUSLY_DISABLE_HOST_CHECK=true
+export WDS_SOCKET_HOST=localhost
+# export API_SERVER=\"${API_SERVER}\"
+export DISABLE_ESLINT_PLUGIN=true
+# exec npm run start
+

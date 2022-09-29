@@ -1,13 +1,14 @@
 import Path from 'path'
 import express from 'express'
 import bodyParser from 'body-parser'
+import Router from 'express-promise-router'
 import proxy from 'express-http-proxy'
 
 export async function createDemoApp(options = {}){
   const app = express()
 
   app.start = function(){
-    app.server = app.listen(env.PORT, () => {
+    app.server = app.listen(options.port, () => {
       const { port } = app.server.address()
       const host = `http://localhost:${port}`
       console.log(`Listening on port ${host}`)
@@ -19,20 +20,30 @@ export async function createDemoApp(options = {}){
     next()
   })
 
-  app.use(uploads)
+  // app.use(uploads)
   app.use(bodyParser.json({
     limit: 102400 * 10,
   }))
 
-  if (env.NODE_ENV === 'production') {
-    app.use(express.static('client/build'))
+  app.Router = Router
+  app.routes = new Router()
+  app.use(app.routes)
+
+  if (process.env.NODE_ENV === 'production') {
+    const buildPath = Path.join(process.env.APP_ROOT, 'client/build')
+    const indexPath = Path.join(buildPath, 'index.html')
+    app.use(express.static(buildPath))
     app.get('/*', function (req, res) {
-      res.sendFile(Path.join(env.BUILD_PATH, 'index.html'));
+      res.sendFile(indexPath);
     })
   }
+
+  // app.use((req, res, error, next) => { }) // TODO add error handler
 
   const errorToJson = error => ({
     message: error.message,
     stack: error.stack,
   })
+
+  return app
 }
