@@ -17,9 +17,6 @@
   "scripts": {
     "postinstall": "link-module-alias"
   },
-  "_moduleAliases": {
-    "jlinx-demo-app": "./shared"
-  },
   "dependencies": {
     "@3id/connect": "^0.4.1",
     "@3id/did-provider": "^0.4.1",
@@ -58,9 +55,20 @@
     "node-fetch": "^3.2.10",
     "node-jose": "^2.1.1",
     "parcel": "^2.7.0",
+    "preact": "^10.11.0",
     "prisma": "^4.3.1",
     "standard": "^17.0.0",
     "tmp-promise": "^3.0.3",
     "uuid": "^9.0.0"
+  },
+  "_moduleAliases": {
+    "jlinx-demo-app": "./shared"
+  },
+  "alias": {
+    "react": "preact/compat",
+    "react-dom": "preact/compat",
+    "react-dom/test-utils": "preact/test-utils",
+    "react/jsx-runtime": "preact/jsx-runtime",
+    "jlinx-demo-app": "./shared"
   }
 }

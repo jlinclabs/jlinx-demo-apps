@@ -4,12 +4,15 @@ import bodyParser from 'body-parser'
 import Router from 'express-promise-router'
 import proxy from 'express-http-proxy'
 
-export async function createDemoApp(options = {}){
+export async function createServer(options = {}){
+  console.log('CREATEING DEMO APP SERVERR', options)
+
+  const APP_PATH = process.env.APP_PATH
+
   const app = express()
 
-  app.start = function(opts = {}){
-    const { host, port } = opts
-    app.server = app.listen(port, () => {
+  app.start = function(){
+    app.server = app.listen(process.env.PORT, () => {
       const { port } = app.server.address()
       const host = `http://localhost:${port}`
       console.log(`Listening on port ${host}`)
@@ -33,8 +36,10 @@ export async function createDemoApp(options = {}){
     res.json({ status: 'ok' })
   })
 
+  // app.use(new RPCRouter())
+
   if (process.env.NODE_ENV === 'production') {
-    const buildPath = Path.join(process.env.APP_ROOT, 'client/build')
+    const buildPath = Path.join(APP_PATH, 'client-build')
     const indexPath = Path.join(buildPath, 'index.html')
     app.use(express.static(buildPath))
     app.get('/*', function (req, res) {
