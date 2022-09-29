@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-knex migrate:down
-knex migrate:up
