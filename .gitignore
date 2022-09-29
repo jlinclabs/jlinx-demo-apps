@@ -71,8 +71,8 @@ artifacts
 .ignore
 
 # jlinx demo apps
+/.proxyrc
 apps/*/.env
 apps/*/uploads
-
-config.json
-jlinx.vault
+apps/*/tmp
+apps/*/client-build
