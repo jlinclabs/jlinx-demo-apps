@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+set -x
+
+APP_PATH=${1%/}
+cd "${APP_PATH}"
+npx prisma migrate dev --schema=./server/schema.prisma
