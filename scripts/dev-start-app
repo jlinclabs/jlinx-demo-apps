@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+export NODE_ENV=development
+export NODE_TLS_REJECT_UNAUTHORIZED="0"
+export APP_ROOT=
+export APP_ROOT=$APP_ROOT
+
+# SERVER_PORT=$(node ./scripts/find-open-port.js)
+# API_SERVER="http://localhost:${SERVER_PORT}"
+
+# exec dotenv -e .env -- concurrently \
+#   --kill-others \
+#   --names "SERVER,CLIENT" \
+#   "PORT=${SERVER_PORT} nodemon -w ./server --exec ./scripts/start.cjs" \
+#   "cd client && SERVER=true HTTPS=false BROWSER=none DANGEROUSLY_DISABLE_HOST_CHECK=true WDS_SOCKET_HOST=localhost API_SERVER=\"${API_SERVER}\" DISABLE_ESLINT_PLUGIN=true npm run start"
+

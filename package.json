@@ -1,8 +1,8 @@
 {
   "private": true,
   "name": "jlinx-demo-apps",
+  "type": "module",
   "version": "0.0.1",
-  "scripts": {},
   "keywords": [],
   "repository": {
     "type": "git",
@@ -14,26 +14,52 @@
     "url": "https://github.com/jlinclabs/jlinx-demo-apps/issues"
   },
   "homepage": "https://github.com/jlinclabs/jlinx-demo-apps#readme",
-  "dependencies": {
-    "b4a": "^1.5.3",
-    "body-parser": "^1.19.2",
-    "connect-pg-simple": "^7.0.0",
-    "cookie-parse": "^0.4.0",
-    "cookie-parser": "^1.4.6",
-    "dotenv": "^16.0.1",
-    "express": "^4.17.3",
-    "express-handlebars": "^6.0.6",
-    "express-promise-router": "^4.1.1",
-    "express-session": "^1.17.3",
-    "jlinx-client": "github:jlinclabs/jlinx-client#6174c47c6843bd9efdc05c5bbe830ff597c4cf7d",
-    "jsonwebtoken": "^8.5.1",
-    "knex": "^2.0.0",
-    "passport-local": "^1.0.0",
-    "pg": "^8.7.3",
-    "qrcode": "^1.5.0",
-    "request-info": "^0.1.0"
+  "scripts": {
+    "postinstall": "link-module-alias"
   },
-  "devDependencies": {
-    "concurrently": "^7.2.1"
+  "_moduleAliases": {
+    "jlinx-demo-app": "./shared"
+  },
+  "dependencies": {
+    "@3id/connect": "^0.4.1",
+    "@3id/did-provider": "^0.4.1",
+    "@ceramicnetwork/3id-did-resolver": "^2.1.7",
+    "@ceramicnetwork/http-client": "^2.3.4",
+    "@ceramicnetwork/stream-tile": "^2.4.3",
+    "@ceramicstudio/idx": "^0.12.2",
+    "@glazed/did-datastore": "^0.3.2",
+    "@prisma/client": "^4.3.1",
+    "b4a": "^1.6.0",
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.20.0",
+    "brittle": "^3.1.0",
+    "concurrently": "^7.4.0",
+    "cookies": "^0.8.0",
+    "dids": "^3.3.0",
+    "dotenv": "^16.0.2",
+    "dotenv-cli": "^6.0.0",
+    "exit-hook": "^3.1.0",
+    "express": "^4.18.1",
+    "express-http-proxy": "^1.6.3",
+    "express-promise-router": "^4.1.1",
+    "find-open-port": "^2.0.3",
+    "gun-avatar": "^1.6.2",
+    "ipfs-http-client": "^58.0.0",
+    "jayson": "^4.0.0",
+    "jlinx-util": "github:jlinclabs/jlinx-util#475374260d65a681000eb7d0c8dfce8674029cbb",
+    "jlinx-vault": "github:jlinclabs/jlinx-vault#7cf353536477761fca0df8e5ec59d15e73e93ef5",
+    "json-canonicalize": "^1.0.4",
+    "key-did-provider-ed25519": "^2.0.1",
+    "key-did-resolver": "^2.1.1",
+    "link-module-alias": "^1.2.0",
+    "lockfile": "^1.0.4",
+    "multer": "^1.4.5-lts.1",
+    "multiformats": "^9.8.1",
+    "node-fetch": "^3.2.10",
+    "node-jose": "^2.1.1",
+    "prisma": "^4.3.1",
+    "standard": "^17.0.0",
+    "tmp-promise": "^3.0.3",
+    "uuid": "^9.0.0"
   }
 }
