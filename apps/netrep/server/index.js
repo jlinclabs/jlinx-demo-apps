@@ -4,7 +4,7 @@ const server = await createDemoApp({
 
 })
 
-server.routes.get('/api/shoplist_test', (req, res) => {
+server.routes.get('/api/netrep_test', (req, res) => {
   res.json({
     netrepTest: 'pass',
   })

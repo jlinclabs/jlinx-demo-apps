@@ -15,11 +15,11 @@ else
   exit 1
 fi
 
-if [ -z "$SERVER_URL" ]; then
-  echo "ERROR: \$SERVER_URL is not set" 1>&2
+if [ -z "$API_SERVER" ]; then
+  echo "ERROR: \$API_SERVER is not set" 1>&2
   exit 1
 else
-  echo SERVER_URL=${SERVER_URL}
+  echo API_SERVER=${API_SERVER}
 fi
 
 PORT=$(dotenv -e ${APP_PATH}/.env -p PORT)
@@ -28,7 +28,7 @@ echo PORT=${PORT}
 cat > "${APP_ROOT}/.proxyrc" <<-EOF
 {
   "/api": {
-    "target": "${SERVER_URL}"
+    "target": "${API_SERVER}"
   }
 }
 EOF
