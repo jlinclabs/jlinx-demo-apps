@@ -72,7 +72,7 @@ artifacts
 
 # jlinx demo apps
 /.proxyrc
-apps/*/.env
-apps/*/uploads
-apps/*/tmp
-apps/*/client-build
+/apps/*/.env
+/apps/*/uploads
+/apps/*/tmp/*
+/apps/*/client-build
