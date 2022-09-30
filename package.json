@@ -72,9 +72,10 @@
     "uuid": "^9.0.0"
   },
   "_moduleAliases": {
-    "jlinx-demo-app": "./shared"
+    "_shared": "./shared"
   },
   "alias": {
-    "jlinx-demo-app": "./shared"
+    "_shared": "./shared",
+    "_shared/components": "./shared/client/components"
   }
 }

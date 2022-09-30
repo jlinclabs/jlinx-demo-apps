@@ -1,4 +1,4 @@
-import render from 'jlinx-demo-app/client/render.js'
+import render from '_shared/client/render.js'
 import Routes from './Routes'
 
 render({
