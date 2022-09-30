@@ -1,7 +1,6 @@
-import ReactDOM from 'react-dom'
-// import App from './App'
-import App from 'jlinx-demo-app/client/App.js'
-ReactDOM.render(
-  <App>shoplist</App>,
-  document.querySelector('body > main')
-)
+import render from 'jlinx-demo-app/client/render.js'
+import Routes from './Routes'
+
+render({
+  Routes
+})
