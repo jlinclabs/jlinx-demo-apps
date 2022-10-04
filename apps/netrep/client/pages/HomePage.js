@@ -11,8 +11,9 @@ export default function HomePage() {
   // const { currentAgent } = useCurrentAgent()
   return <Box p={2}>
     <Paper sx={{p:2}}>
-      <Typography variant="h3">Shop List</Typography>
+      <Typography variant="h3">Net Rep</Typography>
       <InspectObject object={{hello: 'world 22'}}/>
     </Paper>
   </Box>
 }
+

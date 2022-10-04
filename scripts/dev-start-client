@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
-set -x
+# set -x
 
 APP_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && cd .. && pwd)
 APP_PATH=$1

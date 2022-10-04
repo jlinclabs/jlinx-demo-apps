@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
 set -e
-set -x
+# set -x
 
 export NODE_ENV=development
 export NODE_TLS_REJECT_UNAUTHORIZED="0"
 
 APP_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && cd .. && pwd)
-echo APP_ROOT=$APP_ROOT
 cd "$APP_ROOT"
 
 # APP_PATH=$1
 APP_PATH=${1%/}
 echo APP_PATH=$APP_PATH
+APP_NAME=${APP_PATH##*/}
 
 
 # if no app path exists
@@ -29,7 +29,7 @@ API_SERVER="http://localhost:${SERVER_PORT}"
 
 exec dotenv -e .env -- concurrently \
   --kill-others \
-  --names "${APP_PATH}/SERVER,${APP_PATH}/CLIENT" \
+  --names "${APP_NAME} SERVER,${APP_NAME} CLIENT" \
   "PORT=${SERVER_PORT} nodemon -w ./shared -w \"${APP_PATH}\" -- ./scripts/dev-start-server.js \"${APP_PATH}\"" \
   "API_SERVER=${API_SERVER} ./scripts/dev-start-client \"${APP_PATH}\""
   # "cd ${APP_PATH}/client && SERVER=true HTTPS=false BROWSER=none DANGEROUSLY_DISABLE_HOST_CHECK=true WDS_SOCKET_HOST=localhost API_SERVER=\"${API_SERVER}\" DISABLE_ESLINT_PLUGIN=true npm run start"

@@ -18,7 +18,7 @@ export default function render(opts = {}){
     <React.StrictMode>
       <BrowserRouter>
         <ThemeProvider {...{theme}}>
-          <CssBaseline />
+          <CssBaseline enableColorScheme />
           <Routes/>
         </ThemeProvider>
       </BrowserRouter>
@@ -31,14 +31,3 @@ export default function render(opts = {}){
 // // to log results (for example: reportWebVitals(console.log))
 // // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 // reportWebVitals(console.log)
-
-// import Routes from './Routes'
-// import AppError from './components/AppError'
-
-// export default function App() {
-//   return (
-//     <ErrorBoundary FallbackComponent={AppError}>
-//       <Routes/>
-//     </ErrorBoundary>
-//   )
-// }

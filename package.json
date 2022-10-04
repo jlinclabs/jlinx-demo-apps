@@ -75,7 +75,6 @@
     "_shared": "./shared"
   },
   "alias": {
-    "_shared": "./shared",
-    "_shared/components": "./shared/client/components"
+    "_shared": "./shared"
   }
 }
