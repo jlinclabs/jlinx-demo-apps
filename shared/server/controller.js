@@ -9,11 +9,14 @@ export class Controller {
   }
 
   async query(name, options){
-
+    if (!(name in queries)) throw new Error(`invalid query name "${name}"`)
+    return await queries[name](options, this)
   }
 
   async command(name, options){
-
+    if (this.readOnly) throw new Error(`cannot exec command in ready only session`)
+    if (!(name in commands)) throw new Error(`invalid command name "${name}"`)
+    return await commands[name](options, this)
   }
 }
 
@@ -27,25 +30,18 @@ const commands = await importProcedures('server/commands')
 console.log({ queries, commands })
 
 async function importProcedures(path){
-  // TODO reduce this function to some helpers
-  // const __dirname = Path.dirname(fileURLToPath(import.meta.url))
-  // const root = __dirname + '/procedures'
-  // console.log('process.env.APP_PATH', process.env.APP_PATH)
   const root = Path.join(process.env.APP_PATH, path)
-  console.log('importing from', root)
-  // TODO: if dir exists
+  // TODO: if dir doesnt exist return []
   const paths = (await readDirRecursive(root))
-    // .map(path => Path.relative(root, path))
     .map(path => ({
       path,
       parts: path.match(/(.+).js$/),
     }))
     .filter(({parts}) => parts)
-  console.log({ paths })
+
   const modules = await Promise.all(
     paths.map(({path}) => import(path))
   )
-  console.log({ modules })
 
   const procedures = {}
   paths.forEach(({path, parts}, index) => {
