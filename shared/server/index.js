@@ -2,17 +2,22 @@ import Path from 'path'
 import express from 'express'
 import bodyParser from 'body-parser'
 
-// import { loadSession } from './controller.js'
 import { loadSession } from './session.js'
-import { loadQueries, loadCommands } from './cqrs.js'
+import { createController } from './controller.js'
+
+// import { loadSession } from './controller.js'
+// import { loadQueries, loadCommands } from './cqrs.js'
 
 export async function createServer(options){
-  console.log('CREATEING DEMO APP SERVERR', options)
+  console.log('CREATEING DEMO APP SERVERR', {
+    PORT: process.env.PORT,
+    APP_PATH: process.env.APP_PATH,
+  })
 
   const app = express()
 
   app.start = function(){
-    app.server = app.listen(options.port, () => {
+    app.server = app.listen(process.env.PORT, () => {
       const { port } = app.server.address()
       const host = `http://localhost:${port}`
       console.log(`Listening on port ${host}`)
@@ -22,6 +27,10 @@ export async function createServer(options){
   app.use(async (req, res, next) => {
     // console.log(`${req.method} ${req.url}`)
     await loadSession(req, res)
+    req.controller = createController({
+      userId: req.session.userId,
+      readOnly: req.session.readOnly,
+    })
     console.log('HTTP REQUEST', {
       method: req.method,
       url: req.url,
@@ -42,53 +51,27 @@ export async function createServer(options){
     res.json({ status: 'ok' })
   })
 
-  const queries = await loadQueries(
-    Path.join(options.appPath, 'server/queries')
-  )
-  const commands = await loadCommands(
-    Path.join(options.appPath, 'server/commands')
-  )
-
-  app.get('/api/:queryName', async function(req, res, next) {
-    const { queryName } = req.params
-    console.log('EXEC QUERY', {
-      params: req.params,
-      url: req.url,
-      body: req.body,
-    })
-    try{
-      req.session.query(queryName)
-      res.json({
-        params: req.params,
-        url: req.url,
-        body: req.body,
-      })
-    }catch(error){
-      res.status(500).json({
-        error: {
-          message: error.message,
-          stack: error.stack,
-        }
-      })
+  app.use('/api/:name', async function(req, res, next) {
+    const { name } = req.params
+    let options, action
+    if (req.method === 'GET'){
+      action = 'query'
+      options = req.body
+    }else if (req.method === 'POST'){
+      action = 'command'
+      options = req.query
+    }else{
+      return next()
     }
-
-  })
-  app.post('/api/:commandName', async function(req, res, next) {
-    console.log('EXEC COMMAND', {
-      params: req.params,
-      url: req.url,
-      body: req.body,
-    })
-    res.json({
-      params: req.params,
-      url: req.url,
-      body: req.body,
-    })
-    // const options = req.body
-    // const context = {
-    //   // todo session
-    // }
-    // proceedures.call(options, context)
+    console.log(action, { name, options })
+    try{
+      const result = await req.controller[action](name, options)
+      console.error(`${action} SUCCESS`, { name, options, result })
+      res.status(200).json({ result })
+    }catch(error){
+      console.error(`${action} FAILED`, { name, options, error })
+      renderErrorAsJSON(res, 500, error)
+    }
   })
 
   if (process.env.NODE_ENV === 'production') {
@@ -108,4 +91,14 @@ export async function createServer(options){
   })
 
   return app
+}
+
+
+async function renderErrorAsJSON(res, status, error){
+  res.status(status).json({
+    error: {
+      message: error.message,
+      stack: error.stack,
+    }
+  })
 }

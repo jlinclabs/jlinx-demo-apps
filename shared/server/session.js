@@ -45,6 +45,7 @@ class Session {
   async clear(){
 
   }
+
 }
 
 export async function loadSession(req, res){
