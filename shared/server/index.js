@@ -8,11 +8,7 @@ import { createController } from './controller.js'
 // import { loadSession } from './controller.js'
 // import { loadQueries, loadCommands } from './cqrs.js'
 
-export async function createServer(options){
-  console.log('CREATEING DEMO APP SERVERR', {
-    PORT: process.env.PORT,
-    APP_PATH: process.env.APP_PATH,
-  })
+export async function createServer(){
 
   const app = express()
 
