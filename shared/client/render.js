@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 
 import defaultTheme from './theme'
+import DebugPage from './pages/DebugPage'
+import NotFoundPage from './pages/NotFoundPage'
 import './cqrs'
 // import App from './App'
 // import reportWebVitals from './reportWebVitals'
@@ -20,7 +22,10 @@ export default function render(opts = {}){
       <BrowserRouter>
         <ThemeProvider {...{theme}}>
           <CssBaseline enableColorScheme />
-          <Routes/>
+          <Routes>
+            <Route path="/debug" element={<DebugPage/>}/>
+            <Route path="*" element={<NotFoundPage/>}/>
+          </Routes>
         </ThemeProvider>
       </BrowserRouter>
     </React.StrictMode>
