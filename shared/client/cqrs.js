@@ -1,5 +1,6 @@
-import { useRef, useState, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import useSWR, { useSWRConfig } from 'swr'
+import useAsync from './hooks/useAsync'
 
 export async function fetchQuery(name, options = {}){
   const params = new URLSearchParams(options)
@@ -45,3 +46,56 @@ export function useQuery(name, options = {}){
   const reload = useCallback(() => { mutate() }, [mutate])
   return { result, loading, error, mutate, reload }
 }
+
+export function useCommand(name, config){
+  return useAsync(
+    options => fetchCommand(name, options),
+    config
+  )
+}
+
+export function useCommandOnMount(name, options, config){
+  const command = useCommand(name, config)
+  useEffect(
+    () => { if (command.idle) command.call(options) },
+    [name, options]
+  )
+  return command
+}
+
+// export function useRemoteCommand(name, callbacks = {}){
+//   const [value, setValue] = useState(null)
+//   const returnObjectRef = useRef({})
+//   const ro = returnObjectRef.current
+//   ro.pending = value instanceof Promise
+//   ro.call = useCallback(ro.pending
+//     ? () => {
+//       console.trace(`already executing`, { name })
+//       throw new Error(`already executing name="${name}"`)
+//     }
+//     : options => {
+//       const promise = new Promise((resolve, reject) => {
+//         rpc(name, options).then(resolve, reject)
+//       }).then(
+//         result => {
+//           setValue(result)
+//           if (callbacks.onSuccess)
+//             callbacks.onSuccess(result)
+//         },
+//         error => {
+//           setValue(error)
+//           if (callbacks.onFailure)
+//             callbacks.onFailure(error)
+//         },
+//       )
+//       setValue(promise)
+//       return promise
+//     },
+//     [ro.pending, callbacks.onSuccess, callbacks.onFailure]
+//   )
+//   ro.failed = value instanceof Error
+//   ro.success = !ro.pending && !ro.failed && !!value
+//   ro.error = ro.failed ? value : null
+//   ro.result = ro.success ? value : null
+//   return ro
+// }
