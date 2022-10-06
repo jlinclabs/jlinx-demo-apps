@@ -2,6 +2,7 @@ import Path from 'path'
 import express from 'express'
 import bodyParser from 'body-parser'
 
+import { ExpectedError } from './errors.js'
 import { loadSession } from './session.js'
 import { createController } from './controller.js'
 
@@ -66,7 +67,7 @@ export async function createServer(){
       res.status(200).json({ result })
     }catch(error){
       console.error(`${action} FAILED`, { name, options, error })
-      renderErrorAsJSON(res, 500, error)
+      renderErrorAsJSON(res, error)
     }
   })
 
@@ -90,11 +91,15 @@ export async function createServer(){
 }
 
 
-async function renderErrorAsJSON(res, status, error){
-  res.status(status).json({
-    error: {
-      message: error.message,
-      stack: error.stack,
-    }
-  })
+async function renderErrorAsJSON(res, error){
+  res
+    .status(
+      error instanceof ExpectedError ? 400 : 500
+    )
+    .json({
+      error: {
+        message: error.message,
+        stack: error.stack,
+      }
+    })
 }

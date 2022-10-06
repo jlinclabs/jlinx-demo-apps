@@ -1,6 +1,7 @@
 import Path from 'path'
 import { fileURLToPath } from 'url'
 import readDirRecursive from 'recursive-readdir'
+import { InvalidArgumentError } from './errors.js'
 
 export class Controller {
   constructor({ userId, readOnly }){
@@ -9,13 +10,15 @@ export class Controller {
   }
 
   async query(name, options){
-    if (!(name in queries)) throw new Error(`invalid query name "${name}"`)
+    if (!(name in queries))
+      throw new InvalidArgumentError('queryName', name)
     return await queries[name](options, this)
   }
 
   async command(name, options){
     if (this.readOnly) throw new Error(`cannot exec command in ready only session`)
-    if (!(name in commands)) throw new Error(`invalid command name "${name}"`)
+    if (!(name in commands))
+      throw new InvalidArgumentError('commandName', 'name')
     return await commands[name](options, this)
   }
 }
@@ -28,6 +31,15 @@ const queries = await importProcedures('server/queries')
 const commands = await importProcedures('server/commands')
 
 console.log({ queries, commands })
+
+if (process.env.NODE_ENV === 'development'){
+  queries.__queries = async function(){
+    return Object.keys(queries)
+  }
+  queries.__commands = async function(){
+    return Object.keys(commands)
+  }
+}
 
 async function importProcedures(path){
   const root = Path.join(process.env.APP_PATH, path)

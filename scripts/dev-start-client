@@ -33,21 +33,8 @@ cat > "${APP_ROOT}/.proxyrc" <<-EOF
 }
 EOF
 
-npx parcel serve \
+dotenv -e "${APP_PATH}/.env" -- npx parcel serve \
   --port ${PORT} \
   --cache-dir "${APP_PATH}/tmp/cache" \
   --dist-dir "${APP_PATH}/client-build" \
   "${APP_PATH}/client/index.html"
-  # --help \
-  #   --hmr-port <port>          hot module replacement port
-  #   --hmr-host <host>          hot module replacement host
-
-# export SERVER=true
-# export HTTPS=false
-# export BROWSER=none
-# export DANGEROUSLY_DISABLE_HOST_CHECK=true
-# export WDS_SOCKET_HOST=localhost
-# # export API_SERVER=\"${API_SERVER}\"
-# export DISABLE_ESLINT_PLUGIN=true
-# # exec npm run start
-
