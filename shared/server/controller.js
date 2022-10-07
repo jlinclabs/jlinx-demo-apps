@@ -33,7 +33,7 @@ const queries = await importProcedures([
 ])
 
 const commands = await importProcedures([
-  Path.join(process.env.SHARED_PATH, '_shared/server/commands'),
+  Path.join(process.env.SHARED_PATH, 'server/commands'),
   Path.join(process.env.APP_PATH, 'server/commands'),
 ])
 

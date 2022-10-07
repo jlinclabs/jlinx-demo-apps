@@ -8,15 +8,12 @@ generator client {
   binaryTargets = "native"
 }
 
-model Agent {
+model User {
   id           Int       @id @default(autoincrement())
   createdAt    DateTime  @default(now())
   email        String?   @unique
   passwordSalt String?
   passwordHash String?
-  vaultKey     String
-  did          String    @unique
-  didSecret    String    @unique
   sessions     Session[]
 }
 
@@ -24,6 +21,6 @@ model Session {
   id         String   @id @default(uuid())
   createdAt  DateTime @default(now())
   lastSeenAt DateTime @default(now())
-  agent      Agent?   @relation(fields: [agentId], references: [id])
-  agentId    Int?
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     Int?
 }

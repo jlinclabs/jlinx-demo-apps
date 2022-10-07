@@ -1,4 +1,7 @@
 import { useState, useCallback, useMemo } from 'react'
+import { Routes, Route } from 'react-router-dom'
+import { ErrorBoundary } from 'react-error-boundary'
+
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
@@ -9,17 +12,28 @@ import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import Skeleton from '@mui/material/Skeleton'
 import IconButton from '@mui/material/IconButton'
 import EditIcon from '@mui/icons-material/Edit'
 import CloseIcon from '@mui/icons-material/Close'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import KeyboardCommandKeyTwoToneIcon from '@mui/icons-material/KeyboardCommandKeyTwoTone'
 
-import InspectObject from '_shared/client/components/InspectObject'
+import Link from '_shared/client/components/Link'
 import Form from '_shared/client/components/Form'
 import ButtonRow from '_shared/client/components/ButtonRow'
+import ErrorMessage from '_shared/client/components/ErrorMessage'
 import { useQuery, useCommandOnMount } from '_shared/client/cqrs.js'
+import InspectObject from '_shared/client/components/InspectObject'
 // import { useCurrentAgent } from '../resources/auth'
 // import LinkToDid from '../components/LinkToDid'
 // import CopyButton from '../components/CopyButton'
+
 const defaultExec = () => ({
   isCommand: false,
   name: '',
@@ -27,6 +41,109 @@ const defaultExec = () => ({
 })
 
 export default function DebugPage() {
+  const [newExec, setNewExec] = useState(defaultExec())
+
+  return <Container maxWidth={false} disableGutters>
+    <Box sx={{
+      display: 'flex',
+      flexDirection: 'row',
+      minHeight: '100vh',
+      minWidth: '100vw',
+    }}>
+      <SideNav/>
+
+      <ErrorBoundary>
+        <Routes>
+          <Route path="/q/:name" element={<DebugQueryPage/>}/>
+          <Route path="/c/:name" element={<DebugCommandPage/>}/>
+        </Routes>
+      </ErrorBoundary>
+    </Box>
+  </Container>
+}
+
+function SideNav({ onSelect }){
+  const queries = useQuery('__queries')
+  const commands = useQuery('__commands')
+
+  return <Box sx={{
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: 'primary.dark',
+    minWidth: `max(10vw, 175px)`,
+    maxWidth: `max(20vw, 400px)`,
+    overflowX: 'auto',
+  }}>
+    <Typography variant="h6"
+      sx={{
+        my: 2,
+        textAlign: 'center',
+      }}
+    >DEBUG</Typography>
+    {[queries, commands].map(({ result, loading, error }, index) => {
+      const isQuery = index === 0
+      const names = (result || []).filter(n => !n.startsWith('__'))
+      return <Box key={isQuery ? 'q' : 'c'}>
+        <Typography variant="h6" sx={{px: 1}}>
+          {isQuery ? 'Queries' : 'Commands'}
+        </Typography>
+        <ErrorMessage {...{error}}/>
+        <List dense>
+          {loading
+            ? Array(3).fill().map((_, i) =>
+              <Skeleton key={i} animation="wave" height="40px" />
+            )
+            : names.map(name =>
+              <ListItem key={name} disablePadding>
+                <ListItemButton component={Link} to={`/debug/${isQuery ? 'q' : 'c'}/${name}`}>
+                  <ListItemIcon sx={{minWidth: '30px'}}>
+                    {isQuery ? <HelpOutlineIcon/> : <KeyboardCommandKeyTwoToneIcon/>}
+                  </ListItemIcon>
+                  <ListItemText primary={name} />
+                </ListItemButton>
+              </ListItem>
+            )
+          }
+        </List>
+      </Box>
+    })}
+    {/* <ListOfQueries {...{onSelect}}/>
+    <ListOfCommand {...{onSelect}}/> */}
+  </Box>
+}
+
+function ListOfQueries({ onSelect }){
+  const { result, loading, error } = useQuery('__queries')
+  const queries = (result || [])
+    .filter(query => !query.startsWith('__'))
+  return <Box>
+    <Typography variant="h6" sx={{p: 1}}>Queries</Typography>
+    <ErrorMessage {...{error}}/>
+    {loading ? <CircularProgress/> :
+      <List>
+        {queries.map(query =>
+          <ListItem key={query} disablePadding>
+            <ListItemButton onClick={() => {
+              onSelect({query})
+            }}>
+              <ListItemIcon sx={{minWidth: '30px'}}>
+                <HelpOutlineIcon/>
+              </ListItemIcon>
+              <ListItemText primary={query} />
+            </ListItemButton>
+          </ListItem>
+        )}
+      </List>
+    }
+  </Box>
+}
+
+function ListOfCommand(){
+  const query = useQuery('__commands')
+  return <InspectObject object={query} />
+}
+
+function Formmmmmmm() {
   const [newExec, setNewExec] = useState(defaultExec())
   const [executions, setExecutions] = useState([])
 

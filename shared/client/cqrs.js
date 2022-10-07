@@ -38,7 +38,6 @@ const wait = ms => new Promise(resolve => {
   setTimeout(() => { resolve() }, ms)
 })
 
-
 export function useQuery(name, options = {}){
   const swrKey = name ? [name, options] : null
   const { data: result, error, mutate } = useSWR(swrKey, fetchQuery)

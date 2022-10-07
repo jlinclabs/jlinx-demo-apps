@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Route } from 'react-router-dom'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 
 import defaultTheme from './theme'
@@ -23,7 +23,7 @@ export default function render(opts = {}){
         <ThemeProvider {...{theme}}>
           <CssBaseline enableColorScheme />
           <Routes>
-            <Route path="/debug" element={<DebugPage/>}/>
+            <Route path="/debug/*" element={<DebugPage/>}/>
             <Route path="*" element={<NotFoundPage/>}/>
           </Routes>
         </ThemeProvider>
