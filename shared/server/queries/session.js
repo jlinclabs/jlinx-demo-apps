@@ -1,11 +1,9 @@
 export default {
-  async get(options, ctx){
+  async get(options, context){
     return {
-      session: true,
-      fake: true,
-      static: true,
+      id: context.session.id,
+      userId: context.userId,
     }
   },
-
 }
 

@@ -1,12 +1,35 @@
 import fs from 'node:fs/promises'
 import Path from 'path'
 import readDirRecursive from 'recursive-readdir'
+import prisma from './prisma.js'
 import { InvalidArgumentError } from './errors.js'
 
 export class Controller {
-  constructor({ userId, readOnly }){
+  constructor({ session, userId, readOnly }){
+    this.session = session
     this.userId = userId
     this.readOnly = !!readOnly
+  }
+
+  async loginAs(userId){
+    if (this.session) await this.session.loginAs(userId)
+    this.userId = userId
+  }
+
+  async logout(){
+    if (this.session) await this.session.logout()
+    delete this.userId
+  }
+
+  async getCurrentUser(){
+    return await prisma.user.findUnique({
+      where: { id: this.userId },
+      select: {
+        id: true,
+        createdAt: true,
+        email: true,
+      },
+    })
   }
 
   async query(name, options){

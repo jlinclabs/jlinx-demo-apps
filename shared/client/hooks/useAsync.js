@@ -4,7 +4,7 @@ import useForceUpdate from './useForceUpdate'
 
 const STATES = ['idle', 'pending', 'resolved', 'rejected']
 export default function useAsync(asyncFunction, config = {}){
-  const { callOnMount, onSuccess, onFailure } = config
+  const { callOnMount, onSuccess, onFailure, onComplete } = config
   const forceUpdate = useForceUpdate()
   const [ctx] = useState({})
 
@@ -36,8 +36,11 @@ export default function useAsync(asyncFunction, config = {}){
           ctx.error = error
           if (onFailure) await onFailure(error)
           setState(3)
+          return error
         },
-      )
+      ).then(result => {
+        onComplete(result)
+      })
       setState(1)
       return ctx.promise
     },

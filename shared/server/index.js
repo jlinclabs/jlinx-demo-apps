@@ -25,6 +25,7 @@ export async function createServer(){
     // console.log(`${req.method} ${req.url}`)
     await loadSession(req, res)
     req.controller = createController({
+      session: req.session,
       userId: req.session.userId,
       readOnly: req.session.readOnly,
     })

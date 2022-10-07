@@ -14,6 +14,11 @@ class Session {
     this.readOnly = req.method !== 'POST'
   }
 
+  get createdAt () { return this._record.createdAt }
+  get lastSeenAt () { return this._record.lastSeenAt }
+  get userId () { return this._record.user?.id }
+  get user () { return this._record.user }
+
   [Symbol.for('nodejs.util.inspect.custom')] (depth, opts) {
     let indent = ''
     if (typeof opts.indentationLvl === 'number') { while (indent.length < opts.indentationLvl) indent += ' ' }
@@ -28,22 +33,25 @@ class Session {
 
   async load(){
     debug('load', this.id)
-    let record
-    if (this.id) record = await touchSession(this.id)
-    if (!record) {
-      record = await createSession()
+    if (this.id) this._record = await touchSession(this.id)
+    if (!this._record) {
+      this._record = await createSession()
       this.id = record.id
       this.cookies.set(COOKIE_NAME, this.id, { httpOnly: true })
     }
-    debug('loaded', record)
-    this.createdAt = record.createdAt
-    this.lastSeenAt = record.lastSeenAt
-    this.userId = record.user?.id
-    this.user = record.user
+    // debug('loaded', record)
+    // this.createdAt = record.createdAt
+    // this.lastSeenAt = record.lastSeenAt
+    // this.userId = record.user?.id
+    // this.user = record.user
   }
 
-  async clear(){
+  async loginAs(userId){
+    this._record = await setSessionUserId(this.id, userId)
+  }
 
+  async logout(){
+    this._record = await setSessionUserId(this.id, null)
   }
 
 }
@@ -52,8 +60,6 @@ export async function loadSession(req, res){
   req.session = new Session(req, res)
   await req.session.load()
 }
-
-
 
 async function createSession(){
   return await prisma.session.create({
@@ -94,11 +100,22 @@ async function touchSession(id){
   return record
 }
 
-async function setSessionAgentId(id, agentId){
-  console.log('setSessionAgentId', {id, agentId})
-  await prisma.session.update({
+async function setSessionUserId(id, userId){
+  console.log('setSessionUserId', {id, userId})
+  return await prisma.session.update({
     where: { id },
-    data: { agentId }
+    data: { userId },
+    select: {
+      id: true,
+      createdAt: true,
+      lastSeenAt: true,
+      user: {
+        select: {
+          id: true,
+          createdAt: true,
+        }
+      },
+    }
   })
 }
 
