@@ -25,6 +25,9 @@ async function apiFetch(method, path, body, tries = 0){
     },
     body: body ? JSON.stringify(body) : undefined,
   })
+  if (res.status === 502){
+    throw new Error(`API server looks down or you're offline`)
+  }
   if (res.status === 504 && tries < 5) {
     await wait(500)
     return apiFetch(method, path, body, tries + 1)
