@@ -9,6 +9,9 @@ export class Controller {
     this.session = session
     this.userId = userId
     this.readOnly = !!readOnly
+    // TODO context.queries.auth.currentUser({}) // auto sets context as 2nd arg
+    // this.queries = new ProxyThing(queries)
+    // this.commands = new ProxyThing(commands)
   }
 
   async loginAs(userId){

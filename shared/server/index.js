@@ -42,12 +42,10 @@ export async function createServer(){
     limit: 102400 * 10,
   }))
 
+  // TODO look for APP_DIR/server/routes.js and load them
   // app.Router = Router
   // app.routes = new Router()
   // app.use(app.routes)
-  app.get('/api/status', (req, res) => {
-    res.json({ status: 'ok' })
-  })
 
   app.use('/api/:name', async function(req, res, next) {
     const { name } = req.params

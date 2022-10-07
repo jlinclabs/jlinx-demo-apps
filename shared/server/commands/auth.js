@@ -42,20 +42,6 @@ export async function login({ email, password }, context){
   if (!passwordMatches) throw new InvalidArgumentError(`email or password`)
   context.loginAs(record.id)
   return { userId: record.id }
-  // const agentRecord = await findAgentByEmail(email)
-  // console.log({ agentRecord })
-  // const goodPassword = agentRecord &&
-  //   await checkPassword(password, agentRecord.passwordHash)
-
-  // console.log({ goodPassword })
-
-  // if (!agentRecord || !goodPassword){
-  //   throw new InvalidArgumentError(`email or password`)
-  // }
-  // const { did, didSecret, vaultKey } = agentRecord
-  // const agent = await Agent.open({ did, didSecret, vaultKey })
-  // await session.setAgentId(agentRecord.id)
-  // return { did: agent.did }
 }
 
 export async function logout({}, context){

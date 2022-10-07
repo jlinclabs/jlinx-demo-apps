@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt'
 // import { InvalidArgumentError } from '../../errors.js'
 
 export async function currentUser({}, context){
-  return await context.getCurrentUser()
+  return context.userId ? await context.getCurrentUser() : null
 }
 
 // async function findAgentByEmail(email){

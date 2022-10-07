@@ -42,7 +42,6 @@ const wait = ms => new Promise(resolve => {
 })
 
 export function useQuery(name, options = {}, config){
-  console.log('useQuery config', config)
   const swrKey = name ? [name, options] : null
   const { data: result, error, mutate } = useSWR(swrKey, {
     ...config,

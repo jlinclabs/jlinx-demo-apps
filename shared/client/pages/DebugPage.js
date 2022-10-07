@@ -51,7 +51,7 @@ export default function DebugPage() {
   const search = searchToObject(location.search)
   const optionsJson = search.opts
   useEffect(
-    () => { document.title = `Debug Query: ${name}(${optionsJson || ''})` },
+    () => { document.title = `Debug ${process.env.APP_NAME}: ${name}(${optionsJson || ''})` },
     [name, optionsJson]
   )
   const { result: spec, error } = useQuery('__spec')
@@ -99,7 +99,7 @@ function SideNav({ spec }){
         my: 2,
         textAlign: 'center',
       }}
-    >DEBUG</Typography>
+    >Debug {process.env.APP_NAME}</Typography>
     <SideNavButton {...{
       to: `/`,
       icon: <CottageIcon/>,
@@ -137,7 +137,7 @@ function SideNavButtonList({ name, types, icon, linkPrefix }){
     <Typography variant="h6" sx={{pl: 1}}>{name}</Typography>
     <List dense sx={{pt: 0}}>
       {Array.isArray(types)
-        ? types.map(({name, args}) =>
+        ? [...types].sort().map(({name, args}) =>
           <SideNavButton {...{
             key: name,
             to: `${linkPrefix }${name}`,
@@ -155,15 +155,20 @@ function SideNavButtonList({ name, types, icon, linkPrefix }){
 }
 
 function ExecForm({ spec, type, name, optionsJson = '{}' }){
-  const [execution, setExecution] = useState(null)
-  const [executionDone, setExecutionDone] = useState(false)
-
   const location = useLocation()
   const navigate = useNavigate()
   const isCommand = type === 'command'
   const options = safeJsonParse(optionsJson)
   const optionsJsonIsValid = !(options instanceof Error)
   const submittable = !!(name && optionsJsonIsValid)
+
+  const [execution, setExecution] = useState(
+    (type === 'query' && submittable)
+      ? { name, options }
+      : null
+  )
+  const [executionDone, setExecutionDone] = useState(false)
+
 
   const setOptionsJson = useCallback(
     (optionsJson, replace = false) => {
@@ -265,7 +270,6 @@ function ExecForm({ spec, type, name, optionsJson = '{}' }){
 }
 
 function ExecuteQuery({ id, name, options, onComplete }){
-  console.log('ExecuteQuery', { name, options, onComplete })
   const results = useQuery(name, options, {
     dedupingInterval: 0,
     revalidateOnMount: true,
@@ -282,7 +286,6 @@ function ExecuteQuery({ id, name, options, onComplete }){
 }
 
 function ExecuteCommand({ name, options, onComplete }){
-  console.log('ExecuteCommand', { name, options, onComplete })
   const results = useCommandOnMount(name, options, { onComplete })
   return <Execution {...{ ...results, name, options, }}/>
 }
@@ -309,216 +312,6 @@ function Command({ name, options,  ...prop }){
     <InspectObject object={command}/>
   </Tile>
 }
-
-
-// function DebugCommandPage({ spec }){
-//   const { name } = useParams()
-//   const command = spec?.commands.find(q => q.name === name)
-
-//   return <Box>
-//     <Stack direction="row" alignItems="center" spacing={2}>
-//       <KeyboardCommandKeyTwoToneIcon size="lg"/>
-//       <Typography variant="h4">{name}</Typography>
-//     </Stack>
-//     <Typography variant="h6">{command?.args}</Typography>
-//     {/* <Query {...{ name }}/> */}
-//   </Box>
-// }
-
-// function Formmmmmmm() {
-//   const [newExec, setNewExec] = useState(defaultExec())
-//   const [executions, setExecutions] = useState([])
-
-//   const reset = useCallback(
-//     () => { setNewExec(defaultExec()) },
-//     []
-//   )
-//   const addExecution = useCallback(
-//     () => {
-//       const { isCommand, name, optionsJson } = newExec
-//       setExecutions([
-//         ...executions,
-//         { isCommand, name, options: JSON.parse(optionsJson) }
-//       ])
-//       // reset()
-//     },
-//     [newExec, executions],
-//   )
-//   const remExecution = useCallback(
-//     index => {
-//       const dup = [...executions]
-//       dup.splice(index, 1)
-//       setExecutions(dup)
-//     },
-//     [executions],
-//   )
-//   const editExecution = useCallback(
-//     index => {
-//       const { isCommand, name, options } = executions[index]
-//       setNewExec({ isCommand, name, optionsJson: JSON.stringify(options) })
-//     },
-//     [executions],
-//   )
-
-//   return <Container sx={{p: 2}}>
-//     <Typography variant="h3">DEBUG {process.env.APP_NAME}</Typography>
-//     <ExecForm {...{reset, newExec, setNewExec, addExecution}}/>
-//     <Box sx={{display: 'grid'}}>
-//       {executions.map((exec, index) => {
-//         const props = {
-//           key: index,
-//           ...exec,
-//           onDestroy(){ remExecution(index) },
-//           onEdit(){ editExecution(index) },
-//         }
-//         return exec.isCommand
-//           ? <Command {...props}/>
-//           : <Query {...props}/>
-//       })}
-//     </Box>
-//   </Container>
-// }
-
-// function ExecForm({ reset, newExec = {}, setNewExec, addExecution }){
-//   const { isCommand, name, optionsJson } = newExec
-//   const options = safeJsonParse(optionsJson)
-//   const optionsJsonIsValid = !(options instanceof Error)
-//   const submittable = !!(name && optionsJsonIsValid)
-
-//   const [
-//     setIsCommand,
-//     setName,
-//     setOptionsJson,
-//   ] = useMemo(
-//     () => {
-//       const patch = prop => value => setNewExec({ ...newExec, [prop]: value })
-//       return [
-//         patch('isCommand'),
-//         patch('name'),
-//         patch('optionsJson'),
-//       ]
-//     },
-//     [newExec]
-//   )
-
-//   const onSubmit = useCallback(
-//     () => { if (submittable) addExecution() },
-//     [newExec, setNewExec],
-//   )
-
-//   const queryForQueries = useQuery('__queries')
-//   const queryForCommands = useQuery('__commands')
-//   const namesQuery = (isCommand ? queryForCommands : queryForQueries)
-//   const names = namesQuery.result || []
-
-//   const disabled = (
-//     queryForQueries.loading ||
-//     queryForCommands.loading
-//   )
-
-//   return <Form {...{disabled, onSubmit}}>
-//     <Stack spacing={2}>
-//       <Stack direction="row" spacing={2}>
-//         <Select
-//           value={isCommand}
-//           onChange={e => setIsCommand(!!e.target.value)}
-//           autoWidth
-//         >
-//           <MenuItem value={false}>Query</MenuItem>
-//           <MenuItem value={true}>Command</MenuItem>
-//         </Select>
-//         <Select
-//           value={name}
-//           onChange={e => setName(e.target.value)}
-//           autoWidth
-//         >
-//           {names.map(name =>
-//             <MenuItem key={name} value={name}>{name}</MenuItem>)
-//           }
-//         </Select>
-//         {/* <TextField
-//           disabled={disabled}
-//           label={`${isCommand ? 'command' : 'query'} name`}
-//           fullWidth
-//           value={name}
-//           onChange={e => setName(e.target.value)}
-//         /> */}
-//       </Stack>
-//       <TextField
-//         disabled={disabled}
-//         label="options (JSON)"
-//         fullWidth
-//         multiline
-//         value={optionsJson}
-//         onChange={e => setOptionsJson(e.target.value)}
-//         error={optionsJsonIsValid ? false : true /*'invalid json'*/}
-//       />
-//       <ButtonRow sx={{mt: 2}}>
-//         <Button
-//           disabled={disabled || !submittable}
-//           variant="contained"
-//           type="submit"
-//         >{isCommand ? 'execute' : 'query'}</Button>
-
-//         <Button
-//           disabled={disabled}
-//           variant="text"
-//           onClick={reset}
-//         >{'reset'}</Button>
-//       </ButtonRow>
-//     </Stack>
-//   </Form>
-// }
-
-// function Tile({ children, title, onDestroy, onEdit }){
-//   return <Paper sx={{p:1}}>
-//     <ButtonRow sx={{ float: 'right' }}>
-//       <IconButton
-//         color="primary"
-//         aria-label="destroy"
-//         component="label"
-//         onClick={onEdit}
-//       >
-//         <EditIcon />
-//       </IconButton>
-//       <IconButton
-//         color="primary"
-//         aria-label="destroy"
-//         component="label"
-//         onClick={onDestroy}
-//       >
-//         <CloseIcon />
-//       </IconButton>
-//     </ButtonRow>
-//     <Typography variant="h5">{title}</Typography>
-//     {children}
-//   </Paper>
-// }
-
-// function Query({ name, options, ...prop }){
-//   const query = useQuery(name, options)
-//   const params = new URLSearchParams(options)
-//   return <Tile {...{ title: `query: ${name}?${params}`, ...prop}}>
-//     {
-//       query.loading
-//         ? <CircularProgress/>
-//         : query.error
-//           ? <ErrorMessage error={query.error}/>
-//           : <>
-//             <Typography variant="body">result:</Typography>
-//             <InspectObject object={query.result}/>
-//           </>
-//     }
-//   </Tile>
-// }
-
-// function Command({ name, options,  ...prop }){
-//   const command = useCommandOnMount(name, options)
-//   return <Tile {...{ title: `command: ${name}`, ...prop}}>
-//     <InspectObject object={{ options }}/>
-//     <InspectObject object={command}/>
-//   </Tile>
-// }
 
 function safeJsonParse(json){
   try{

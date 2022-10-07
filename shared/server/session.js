@@ -36,7 +36,7 @@ class Session {
     if (this.id) this._record = await touchSession(this.id)
     if (!this._record) {
       this._record = await createSession()
-      this.id = record.id
+      this.id = this._record.id
       this.cookies.set(COOKIE_NAME, this.id, { httpOnly: true })
     }
     // debug('loaded', record)
