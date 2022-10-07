@@ -53,10 +53,10 @@ export async function createServer(){
     let options, action
     if (req.method === 'GET'){
       action = 'query'
-      options = req.body
+      options = req.query
     }else if (req.method === 'POST'){
       action = 'command'
-      options = req.query
+      options = req.body
     }else{
       return next()
     }

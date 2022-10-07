@@ -51,5 +51,3 @@ export default function useAsync(asyncFunction, config = {}){
 
   return ctx
 }
-
-console.log('useAsync useAsync  useAsync useAsync useAsync useAsync useAsync ')
