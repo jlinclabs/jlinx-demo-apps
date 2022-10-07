@@ -42,8 +42,7 @@ const defaultExec = () => ({
 
 export default function DebugPage() {
   const { result: spec, error } = useQuery('__spec')
-  const queries = spec?.queries
-  const commands = spec?.commands
+  const props = { spec }
   return <Container maxWidth={false} disableGutters>
     <Box sx={{
       display: 'flex',
@@ -51,13 +50,13 @@ export default function DebugPage() {
       minHeight: '100vh',
       minWidth: '100vw',
     }}>
-      <SideNav {...{queries, commands}}/>
+      <SideNav {...{spec}}/>
       <Box sx={{ flex: '1 1', p: 2 }}>
         <ErrorMessage {...{error}}/>
         <ErrorBoundary>
           <Routes>
-            <Route path="/q/:name" element={<DebugQueryPage/>}/>
-            <Route path="/c/:name" element={<DebugCommandPage/>}/>
+            <Route path="/q/:name" element={<DebugQueryPage {...props}/>}/>
+            <Route path="/c/:name" element={<DebugCommandPage {...props}/>}/>
           </Routes>
         </ErrorBoundary>
       </Box>
@@ -65,7 +64,7 @@ export default function DebugPage() {
   </Container>
 }
 
-function SideNav({ queries, commands }){
+function SideNav({ spec }){
   return <Box sx={{
     display: 'flex',
     flexDirection: 'column',
@@ -82,13 +81,13 @@ function SideNav({ queries, commands }){
     >DEBUG</Typography>
     <SideNavButtonList {...{
       name: 'Queries',
-      types: queries,
+      types: spec?.queries,
       icon: <HelpOutlineIcon/>,
       linkPrefix: '/debug/q/',
     }}/>
     <SideNavButtonList {...{
       name: 'Commands',
-      types: commands,
+      types: spec?.commands,
       icon: <KeyboardCommandKeyTwoToneIcon/>,
       linkPrefix: '/debug/c/',
     }}/>
@@ -119,20 +118,30 @@ function SideNavButtonList({ name, types, icon, linkPrefix }){
   </Box>
 }
 
-function DebugQueryPage(){
+function DebugQueryPage({ spec }){
   const { name } = useParams()
+  const query = spec?.queries.find(q => q.name === name)
   return <Box>
     <Stack direction="row" alignItems="center" spacing={2}>
-      <HelpOutlineIcon/>
+      <HelpOutlineIcon size="lg"/>
       <Typography variant="h4">{name}</Typography>
     </Stack>
-    <Typography variant="h4">{name}</Typography>
+    <Typography variant="h6">{query?.args}</Typography>
     {/* <Query {...{ name }}/> */}
   </Box>
 }
 
-function DebugCommandPage(){
-  return <div>DebugCommandPage</div>
+function DebugCommandPage({ spec }){
+  const { name } = useParams()
+  const command = spec?.commands.find(q => q.name === name)
+  return <Box>
+    <Stack direction="row" alignItems="center" spacing={2}>
+      <KeyboardCommandKeyTwoToneIcon size="lg"/>
+      <Typography variant="h4">{name}</Typography>
+    </Stack>
+    <Typography variant="h6">{command?.args}</Typography>
+    {/* <Query {...{ name }}/> */}
+  </Box>
 }
 
 function Formmmmmmm() {
