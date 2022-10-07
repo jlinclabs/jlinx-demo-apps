@@ -40,11 +40,21 @@ const commands = await importProcedures([
 console.log({ queries, commands })
 
 if (process.env.NODE_ENV === 'development'){
-  queries.__queries = async function(){
-    return Object.keys(queries)
-  }
-  queries.__commands = async function(){
-    return Object.keys(commands)
+  queries.__spec = async function(){
+    const getArgs = func => func.toString().match(/\(([^)]*)/)[1]
+    const spec = {}
+    spec.queries = Object.keys(queries)
+      .filter(n => n !== '__spec')
+      .map(name => ({
+        name,
+        args: getArgs(queries[name])
+      }))
+    spec.commands = Object.keys(commands)
+      .map(name => ({
+        name,
+        args: getArgs(commands[name])
+      }))
+    return spec
   }
 }
 

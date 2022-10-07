@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useParams } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import Container from '@mui/material/Container'
@@ -41,8 +41,9 @@ const defaultExec = () => ({
 })
 
 export default function DebugPage() {
-  const [newExec, setNewExec] = useState(defaultExec())
-
+  const { result: spec, error } = useQuery('__spec')
+  const queries = spec?.queries
+  const commands = spec?.commands
   return <Container maxWidth={false} disableGutters>
     <Box sx={{
       display: 'flex',
@@ -50,22 +51,21 @@ export default function DebugPage() {
       minHeight: '100vh',
       minWidth: '100vw',
     }}>
-      <SideNav/>
-
-      <ErrorBoundary>
-        <Routes>
-          <Route path="/q/:name" element={<DebugQueryPage/>}/>
-          <Route path="/c/:name" element={<DebugCommandPage/>}/>
-        </Routes>
-      </ErrorBoundary>
+      <SideNav {...{queries, commands}}/>
+      <Box sx={{ flex: '1 1', p: 2 }}>
+        <ErrorMessage {...{error}}/>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/q/:name" element={<DebugQueryPage/>}/>
+            <Route path="/c/:name" element={<DebugCommandPage/>}/>
+          </Routes>
+        </ErrorBoundary>
+      </Box>
     </Box>
   </Container>
 }
 
-function SideNav({ onSelect }){
-  const queries = useQuery('__queries')
-  const commands = useQuery('__commands')
-
+function SideNav({ queries, commands }){
   return <Box sx={{
     display: 'flex',
     flexDirection: 'column',
@@ -80,67 +80,59 @@ function SideNav({ onSelect }){
         textAlign: 'center',
       }}
     >DEBUG</Typography>
-    {[queries, commands].map(({ result, loading, error }, index) => {
-      const isQuery = index === 0
-      const names = (result || []).filter(n => !n.startsWith('__'))
-      return <Box key={isQuery ? 'q' : 'c'}>
-        <Typography variant="h6" sx={{px: 1}}>
-          {isQuery ? 'Queries' : 'Commands'}
-        </Typography>
-        <ErrorMessage {...{error}}/>
-        <List dense>
-          {loading
-            ? Array(3).fill().map((_, i) =>
-              <Skeleton key={i} animation="wave" height="40px" />
-            )
-            : names.map(name =>
-              <ListItem key={name} disablePadding>
-                <ListItemButton component={Link} to={`/debug/${isQuery ? 'q' : 'c'}/${name}`}>
-                  <ListItemIcon sx={{minWidth: '30px'}}>
-                    {isQuery ? <HelpOutlineIcon/> : <KeyboardCommandKeyTwoToneIcon/>}
-                  </ListItemIcon>
-                  <ListItemText primary={name} />
-                </ListItemButton>
-              </ListItem>
-            )
-          }
-        </List>
-      </Box>
-    })}
-    {/* <ListOfQueries {...{onSelect}}/>
-    <ListOfCommand {...{onSelect}}/> */}
+    <SideNavButtonList {...{
+      name: 'Queries',
+      types: queries,
+      icon: <HelpOutlineIcon/>,
+      linkPrefix: '/debug/q/',
+    }}/>
+    <SideNavButtonList {...{
+      name: 'Commands',
+      types: commands,
+      icon: <KeyboardCommandKeyTwoToneIcon/>,
+      linkPrefix: '/debug/c/',
+    }}/>
   </Box>
 }
 
-function ListOfQueries({ onSelect }){
-  const { result, loading, error } = useQuery('__queries')
-  const queries = (result || [])
-    .filter(query => !query.startsWith('__'))
+function SideNavButtonList({ name, types, icon, linkPrefix }){
+  console.log('SideNavButtonList', { name, types, icon, linkPrefix })
   return <Box>
-    <Typography variant="h6" sx={{p: 1}}>Queries</Typography>
-    <ErrorMessage {...{error}}/>
-    {loading ? <CircularProgress/> :
-      <List>
-        {queries.map(query =>
-          <ListItem key={query} disablePadding>
-            <ListItemButton onClick={() => {
-              onSelect({query})
-            }}>
+    <Typography variant="h6" sx={{px: 1}}>{name}</Typography>
+    <List dense>
+      {Array.isArray(types)
+        ? types.map(({name, args}) =>
+          <ListItem key={name} disablePadding>
+            <ListItemButton component={Link} to={`${linkPrefix }${name}`}>
               <ListItemIcon sx={{minWidth: '30px'}}>
-                <HelpOutlineIcon/>
+                {icon}
               </ListItemIcon>
-              <ListItemText primary={query} />
+              <ListItemText primary={name} secondary={args} />
             </ListItemButton>
           </ListItem>
-        )}
-      </List>
-    }
+        )
+        : Array(3).fill().map((_, i) =>
+          <Skeleton key={i} animation="wave" height="40px" />
+        )
+      }
+    </List>
   </Box>
 }
 
-function ListOfCommand(){
-  const query = useQuery('__commands')
-  return <InspectObject object={query} />
+function DebugQueryPage(){
+  const { name } = useParams()
+  return <Box>
+    <Stack direction="row" alignItems="center" spacing={2}>
+      <HelpOutlineIcon/>
+      <Typography variant="h4">{name}</Typography>
+    </Stack>
+    <Typography variant="h4">{name}</Typography>
+    {/* <Query {...{ name }}/> */}
+  </Box>
+}
+
+function DebugCommandPage(){
+  return <div>DebugCommandPage</div>
 }
 
 function Formmmmmmm() {
