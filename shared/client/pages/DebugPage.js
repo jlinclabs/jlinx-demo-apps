@@ -42,19 +42,20 @@ const defaultExec = () => ({
   optionsJson: '{}',
 })
 
+const searchToString = object => (new URLSearchParams(object)).toString()
+const searchToObject = search => Object.fromEntries((new URLSearchParams(search)).entries())
+
 export default function DebugPage() {
   const location = useLocation()
+  const name = location.pathname.split('/').reverse()[0]
+  const search = searchToObject(location.search)
+  const optionsJson = search.opts
   useEffect(
-    () => {
-      console.log(location.pathname, location.state?.optionsJson)
-      const name = location.pathname.split('/').reverse()[0]
-      const opts = location.state?.optionsJson || '{}'
-      document.title = `Debug Query: ${name}(${opts})`
-    },
-    [location.pathname, location.state?.optionsJson]
+    () => { document.title = `Debug Query: ${name}(${optionsJson}})` },
+    [name, optionsJson]
   )
   const { result: spec, error } = useQuery('__spec')
-  const props = { spec }
+  const props = { spec, name, optionsJson }
   return <Container maxWidth={false} disableGutters>
     <Box sx={{
       display: 'flex',
@@ -132,13 +133,13 @@ function SideNavButton({ icon, title, subtitle, ...props }){
 }
 
 function SideNavButtonList({ name, types, icon, linkPrefix }){
-  console.log('SideNavButtonList', { name, types, icon, linkPrefix })
   return <Box>
     <Typography variant="h6" sx={{pl: 1}}>{name}</Typography>
     <List dense sx={{pt: 0}}>
       {Array.isArray(types)
         ? types.map(({name, args}) =>
           <SideNavButton {...{
+            key: name,
             to: `${linkPrefix }${name}`,
             icon,
             title: name,
@@ -153,15 +154,11 @@ function SideNavButtonList({ name, types, icon, linkPrefix }){
   </Box>
 }
 
-function ExecForm({ spec, type }){
+function ExecForm({ spec, type, name, optionsJson = '{}' }){
   const location = useLocation()
-  console.log('location!', location)
   const navigate = useNavigate()
-
-  const { name } = useParams()
   const query = spec?.queries.find(q => q.name === name)
   const isCommand = type === 'command'
-  const optionsJson = location.state?.optionsJson || '{}'
   const options = safeJsonParse(optionsJson)
   const optionsJsonIsValid = !(options instanceof Error)
   const submittable = !!(name && optionsJsonIsValid)
@@ -179,8 +176,6 @@ function ExecForm({ spec, type }){
   )
 
   const names = spec && (isCommand ? spec.commands : spec.queries) || []
-  console.log({ names })
-
   const disabled = false
 
   return <Form {...{disabled, onSubmit}}>
@@ -209,15 +204,13 @@ function ExecForm({ spec, type }){
         multiline
         value={optionsJson}
         onChange={e => {
-          // setOptionsJson(e.target.value)
           const optionsJson = e.target.value
-          location
-          console.log({ location, optionsJson })
-          navigate(location.pathname, {
-            replace: true,
-            state: { optionsJson },
-            // search: ""
-          })
+          // const nowSearch = new URLSearchParams(location.search)
+          // const newSearch = new URLSearchParams({opts: optionsJson}).toString()
+          const newSearch = searchToString({opts: optionsJson})
+          let url = location.pathname
+          if (newSearch) url += '?' + newSearch
+          navigate(url, { replace: true })
         }}
         error={optionsJsonIsValid ? false : true /*'invalid json'*/}
       />
