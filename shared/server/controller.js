@@ -27,6 +27,9 @@ export function createController(opts){
   return new Controller(opts)
 }
 
+// CONSIDER NOT importing shared by default and instead
+// making each app require the bits it want
+
 const queries = await importProcedures([
   Path.join(process.env.SHARED_PATH, 'server/queries'),
   Path.join(process.env.APP_PATH, 'server/queries'),
