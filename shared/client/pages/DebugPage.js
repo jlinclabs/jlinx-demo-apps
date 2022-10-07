@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo } from 'react'
-import { Routes, Route, useParams } from 'react-router-dom'
+import { useEffect, useState, useCallback, useMemo } from 'react'
+import { Routes, Route, useParams, useNavigate, useLocation } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import Container from '@mui/material/Container'
@@ -43,6 +43,16 @@ const defaultExec = () => ({
 })
 
 export default function DebugPage() {
+  const location = useLocation()
+  useEffect(
+    () => {
+      console.log(location.pathname, location.state?.optionsJson)
+      const name = location.pathname.split('/').reverse()[0]
+      const opts = location.state?.optionsJson || '{}'
+      document.title = `Debug Query: ${name}(${opts})`
+    },
+    [location.pathname, location.state?.optionsJson]
+  )
   const { result: spec, error } = useQuery('__spec')
   const props = { spec }
   return <Container maxWidth={false} disableGutters>
@@ -57,8 +67,16 @@ export default function DebugPage() {
         <ErrorMessage {...{error}}/>
         <ErrorBoundary FallbackComponent={AppError}>
           <Routes>
-            <Route path="/q/:name" element={<ExecForm {...props} type="query"/>}/>
-            <Route path="/c/:name" element={<ExecForm {...props} type="command"/>}/>
+            <Route
+              path="/q/:name"
+              element={<ExecForm {...props} type="query"/>}
+              title="do a query"
+            />
+            <Route
+              path="/c/:name"
+              element={<ExecForm {...props} type="command"/>}
+              title="do a command"
+            />
           </Routes>
         </ErrorBoundary>
       </Box>
@@ -136,17 +154,22 @@ function SideNavButtonList({ name, types, icon, linkPrefix }){
 }
 
 function ExecForm({ spec, type }){
+  const location = useLocation()
+  console.log('location!', location)
+  const navigate = useNavigate()
+
   const { name } = useParams()
   const query = spec?.queries.find(q => q.name === name)
   const isCommand = type === 'command'
-  // const { isCommand, name, optionsJson } = newExec
-  const [optionsJson, setOptionsJson] = useState('{}')
+  const optionsJson = location.state?.optionsJson || '{}'
   const options = safeJsonParse(optionsJson)
   const optionsJsonIsValid = !(options instanceof Error)
   const submittable = !!(name && optionsJsonIsValid)
 
   const reset = useCallback(
-    () => {  },
+    () => {
+      navigate(location.pathname, { state: {} })
+    },
     [],
   )
 
@@ -163,30 +186,21 @@ function ExecForm({ spec, type }){
   return <Form {...{disabled, onSubmit}}>
     <Stack spacing={2}>
       <Stack direction="row" spacing={2}>
-        <Select
-          value={isCommand}
-          onChange={e => setIsCommand(!!e.target.value)}
-          autoWidth
-        >
-          <MenuItem value={false}>Query</MenuItem>
-          <MenuItem value={true}>Command</MenuItem>
-        </Select>
+        <Typography variant="h4">{type}</Typography>
         <Select
           value={name}
-          onChange={e => setName(e.target.value)}
+          // onChange={e => setName(e.target.value)}
           autoWidth
         >
           {names.map(({name}) =>
-            <MenuItem key={name} value={name}>{name}</MenuItem>)
+            <MenuItem
+              key={name}
+              value={name}
+              component={Link}
+              to={`/debug/${isCommand ? 'c': 'q'}/${name}`}
+            >{name}</MenuItem>)
           }
         </Select>
-        {/* <TextField
-          disabled={disabled}
-          label={`${isCommand ? 'command' : 'query'} name`}
-          fullWidth
-          value={name}
-          onChange={e => setName(e.target.value)}
-        /> */}
       </Stack>
       <TextField
         disabled={disabled}
@@ -194,7 +208,17 @@ function ExecForm({ spec, type }){
         fullWidth
         multiline
         value={optionsJson}
-        onChange={e => setOptionsJson(e.target.value)}
+        onChange={e => {
+          // setOptionsJson(e.target.value)
+          const optionsJson = e.target.value
+          location
+          console.log({ location, optionsJson })
+          navigate(location.pathname, {
+            replace: true,
+            state: { optionsJson },
+            // search: ""
+          })
+        }}
         error={optionsJsonIsValid ? false : true /*'invalid json'*/}
       />
       <ButtonRow sx={{mt: 2}}>
