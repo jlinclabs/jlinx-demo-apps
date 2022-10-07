@@ -155,7 +155,6 @@ function SideNavButtonList({ name, types, icon, linkPrefix }){
 }
 
 function ExecForm({ spec, type, name, optionsJson = '{}' }){
-  // const [state, setState] = useState(0 /* 0 | 1 | 2 */)
   const [execution, setExecution] = useState(null)
   const [executionDone, setExecutionDone] = useState(false)
 
@@ -238,6 +237,7 @@ function ExecForm({ spec, type, name, optionsJson = '{}' }){
             disabled={disabled || !submittable}
             variant="contained"
             type="submit"
+            autoFocus
           >{isCommand ? 'execute' : 'query'}</Button>
 
           <Button
